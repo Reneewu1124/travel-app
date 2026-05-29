@@ -1,0 +1,790 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="theme-color" content="#1a1a1a">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black">
+<meta name="apple-mobile-web-app-title" content="旅遊管家">
+<title>旅遊管家</title>
+<link rel="manifest" href="manifest.json">
+<style>
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent;}
+body{font-family:-apple-system,BlinkMacSystemFont,'Helvetica Neue',Arial,sans-serif;background:#f5f5f5;color:#1a1a1a;max-width:430px;margin:0 auto;min-height:100vh;background:#fff;}
+.screen{display:none;flex-direction:column;min-height:100vh;}
+.screen.active{display:flex;}
+
+/* 頂部導覽 */
+.topbar{display:flex;align-items:center;justify-content:space-between;padding:16px 20px 12px;background:#fff;border-bottom:0.5px solid #e5e5e5;position:sticky;top:0;z-index:10;}
+.topbar-title{font-size:17px;font-weight:600;display:flex;align-items:center;gap:8px;}
+.topbar-right{display:flex;align-items:center;gap:10px;}
+.mode-badge{font-size:11px;padding:3px 10px;border-radius:20px;}
+.mode-admin{background:#1a1a1a;color:#fff;}
+.mode-view{background:#e8f5e9;color:#2e7d32;}
+.icon-btn{background:none;border:none;cursor:pointer;color:#666;font-size:20px;padding:4px;display:flex;align-items:center;}
+
+/* 底部導覽 */
+.tab-bar{display:flex;border-top:0.5px solid #e5e5e5;padding:8px 0 env(safe-area-inset-bottom, 12px);background:#fff;position:sticky;bottom:0;}
+.tab-item{flex:1;display:flex;flex-direction:column;align-items:center;gap:3px;cursor:pointer;color:#999;font-size:10px;border:none;background:none;padding:4px 0;}
+.tab-item.active{color:#1a1a1a;}
+.tab-item svg{width:22px;height:22px;stroke:currentColor;fill:none;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round;}
+
+/* 內容區 */
+.content{flex:1;padding:16px;overflow-y:auto;}
+.section-label{font-size:11px;color:#999;letter-spacing:0.5px;text-transform:uppercase;margin:16px 0 8px;}
+.section-label:first-child{margin-top:0;}
+
+/* 卡片 */
+.card{background:#fff;border:0.5px solid #e5e5e5;border-radius:12px;padding:14px 16px;margin-bottom:10px;}
+.card.clickable{cursor:pointer;}
+.card.clickable:active{background:#f9f9f9;}
+.card-row{display:flex;align-items:center;gap:12px;}
+.card-icon{width:36px;height:36px;border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0;}
+.card-icon.blue{background:#e3f2fd;color:#1565c0;}
+.card-icon.green{background:#e8f5e9;color:#2e7d32;}
+.card-icon.amber{background:#fff8e1;color:#e65100;}
+.card-icon.purple{background:#f3e5f5;color:#6a1b9a;}
+.card-icon.coral{background:#fbe9e7;color:#bf360c;}
+.card-title{font-size:14px;font-weight:600;color:#1a1a1a;}
+.card-sub{font-size:12px;color:#999;margin-top:2px;}
+.card-chevron{margin-left:auto;color:#ccc;font-size:16px;}
+
+/* 旅程卡片 */
+.trip-card{border-radius:12px;border:0.5px solid #e5e5e5;overflow:hidden;margin-bottom:12px;cursor:pointer;}
+.trip-card:active{opacity:0.9;}
+.trip-header{background:#1a1a1a;color:#fff;padding:16px;}
+.trip-name{font-size:16px;font-weight:600;}
+.trip-date{font-size:12px;opacity:0.6;margin-top:4px;}
+.trip-badge{display:inline-block;background:rgba(255,255,255,0.2);color:#fff;font-size:11px;padding:3px 9px;border-radius:20px;margin-top:8px;}
+.trip-body{padding:12px 16px;background:#fff;display:flex;gap:16px;}
+.trip-stat{font-size:12px;color:#999;display:flex;align-items:center;gap:4px;}
+
+/* 人員切換 */
+.person-row{display:flex;gap:8px;margin-bottom:16px;flex-wrap:wrap;}
+.person-pill{padding:6px 14px;border-radius:20px;font-size:13px;cursor:pointer;border:0.5px solid #e5e5e5;color:#666;background:#fff;}
+.person-pill.active{background:#1a1a1a;color:#fff;border-color:#1a1a1a;}
+
+/* 欄位顯示 */
+.field-row{display:flex;justify-content:space-between;align-items:flex-start;padding:7px 0;border-bottom:0.5px solid #f0f0f0;}
+.field-row:last-child{border-bottom:none;}
+.field-label{font-size:13px;color:#999;flex-shrink:0;}
+.field-value{font-size:13px;color:#1a1a1a;font-weight:500;text-align:right;max-width:60%;}
+.field-value.link{color:#1a73e8;}
+
+/* 設施 */
+.facility-row{display:flex;align-items:center;justify-content:space-between;padding:8px 0;border-bottom:0.5px solid #f0f0f0;}
+.facility-row:last-child{border-bottom:none;}
+.facility-left{display:flex;align-items:center;gap:8px;}
+.facility-icon{width:28px;height:28px;border-radius:6px;display:flex;align-items:center;justify-content:center;font-size:16px;}
+.facility-icon.pool{background:#e3f2fd;color:#1565c0;}
+.facility-icon.gym{background:#f3e5f5;color:#6a1b9a;}
+.facility-name{font-size:13px;font-weight:500;}
+.facility-detail{font-size:11px;color:#999;margin-top:1px;}
+.has-badge{font-size:11px;padding:3px 10px;border-radius:20px;}
+.has-yes{background:#e8f5e9;color:#2e7d32;}
+.has-no{background:#f5f5f5;color:#999;}
+
+/* 機票看板 */
+.flight-board{background:#1a1a1a;border-radius:12px;padding:16px;margin-bottom:10px;color:#fff;}
+.flight-route{display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;}
+.flight-airport{text-align:center;}
+.flight-code{font-size:26px;font-weight:700;}
+.flight-city{font-size:11px;opacity:0.6;margin-top:2px;}
+.flight-time{font-size:13px;margin-top:4px;}
+.flight-info{display:flex;gap:6px;flex-wrap:wrap;}
+.flight-tag{background:rgba(255,255,255,0.15);color:#fff;font-size:11px;padding:3px 8px;border-radius:20px;}
+
+/* 護照 */
+.passport-card{background:#1a1a1a;border-radius:12px;padding:16px;margin-bottom:10px;color:#fff;}
+.passport-name{font-size:16px;font-weight:600;}
+.passport-sub{font-size:12px;opacity:0.6;margin-top:2px;}
+.passport-fields{display:flex;justify-content:space-between;margin-top:12px;}
+.passport-field label{font-size:10px;opacity:0.6;}
+.passport-field p{font-size:13px;font-weight:500;margin-top:2px;}
+.warn-box{background:#fff8e1;color:#e65100;font-size:12px;padding:8px 12px;border-radius:8px;display:flex;align-items:center;gap:6px;margin-top:8px;}
+
+/* 時間軸 */
+.timeline-item{display:flex;gap:12px;margin-bottom:16px;}
+.tl-left{display:flex;flex-direction:column;align-items:center;width:44px;flex-shrink:0;}
+.tl-time{font-size:11px;color:#999;}
+.tl-dot{width:10px;height:10px;border-radius:50%;margin-top:4px;flex-shrink:0;}
+.tl-line{width:1px;flex:1;background:#e5e5e5;margin-top:3px;}
+.tl-title{font-size:13px;font-weight:600;}
+.tl-sub{font-size:12px;color:#999;margin-top:2px;}
+
+/* 按鈕 */
+.btn-primary{width:100%;padding:13px;background:#1a1a1a;color:#fff;border:none;border-radius:12px;font-size:14px;font-weight:600;cursor:pointer;}
+.btn-primary:active{opacity:0.9;}
+.btn-secondary{padding:13px;background:none;color:#666;border:0.5px solid #e5e5e5;border-radius:12px;font-size:13px;cursor:pointer;}
+.btn-secondary:active{background:#f5f5f5;}
+.btn-row{display:flex;gap:8px;margin-top:12px;}
+.btn-edit{background:none;border:0.5px solid #e5e5e5;border-radius:8px;padding:6px 12px;font-size:12px;cursor:pointer;color:#666;display:flex;align-items:center;gap:4px;}
+.btn-delete{background:none;border:0.5px solid #ffcdd2;border-radius:8px;padding:6px 12px;font-size:12px;cursor:pointer;color:#c62828;display:flex;align-items:center;gap:4px;}
+.add-card{border:1px dashed #e5e5e5;border-radius:12px;padding:14px;margin-bottom:10px;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:8px;color:#999;font-size:13px;background:none;width:100%;}
+.add-card:active{background:#f9f9f9;}
+
+/* OCR 區域 */
+.ocr-zone{border:1.5px dashed #e5e5e5;border-radius:12px;padding:20px;text-align:center;color:#999;font-size:13px;cursor:pointer;margin-bottom:14px;}
+.ocr-zone:active{background:#f9f9f9;}
+
+/* 表單 */
+.form-label{font-size:12px;color:#666;margin-bottom:4px;margin-top:12px;display:block;}
+.form-label:first-child{margin-top:0;}
+input[type=text],input[type=tel],input[type=email],input[type=number],input[type=date],input[type=datetime-local],input[type=password],select,textarea{width:100%;padding:10px 12px;border:0.5px solid #e5e5e5;border-radius:8px;font-size:14px;color:#1a1a1a;background:#fff;outline:none;appearance:none;-webkit-appearance:none;}
+input:focus,select:focus,textarea:focus{border-color:#1a1a1a;}
+textarea{resize:none;}
+.grid-2{display:grid;grid-template-columns:1fr 1fr;gap:8px;}
+.toggle-row{display:flex;align-items:center;justify-content:space-between;padding:10px 0;border-bottom:0.5px solid #f0f0f0;}
+.toggle-row:last-child{border-bottom:none;}
+.toggle-label{font-size:13px;color:#1a1a1a;display:flex;align-items:center;gap:8px;}
+.toggle{width:44px;height:24px;border-radius:12px;background:#e5e5e5;position:relative;cursor:pointer;transition:background 0.2s;flex-shrink:0;border:none;}
+.toggle.on{background:#1a1a1a;}
+.toggle::after{content:'';position:absolute;width:20px;height:20px;border-radius:50%;background:#fff;top:2px;left:2px;transition:left 0.2s;}
+.toggle.on::after{left:22px;}
+.expand-fields{overflow:hidden;max-height:0;transition:max-height 0.2s;}
+.expand-fields.open{max-height:200px;}
+
+/* 登入頁 */
+.login-wrap{flex:1;display:flex;flex-direction:column;justify-content:center;padding:32px 28px;}
+.login-logo{text-align:center;margin-bottom:40px;}
+.login-logo-icon{font-size:52px;display:block;margin-bottom:12px;}
+.login-title{font-size:24px;font-weight:700;}
+.login-sub{font-size:13px;color:#999;margin-top:6px;}
+.login-hint{margin-top:24px;padding:14px;background:#f9f9f9;border-radius:12px;font-size:12px;color:#666;}
+.login-hint strong{color:#1a1a1a;}
+.error-msg{font-size:12px;color:#c62828;text-align:center;min-height:18px;margin-top:6px;}
+
+/* 空狀態 */
+.empty-state{text-align:center;padding:48px 20px;color:#ccc;}
+.empty-state-icon{font-size:48px;display:block;margin-bottom:12px;}
+.empty-state p{font-size:14px;}
+
+/* 分隔線 */
+.divider{text-align:center;font-size:12px;color:#ccc;margin:12px 0;position:relative;}
+.divider::before,.divider::after{content:'';position:absolute;top:50%;width:40%;height:0.5px;background:#e5e5e5;}
+.divider::before{left:0;}
+.divider::after{right:0;}
+
+.spacer{height:16px;}
+</style>
+</head>
+<body>
+
+<!-- 登入畫面 -->
+<div class="screen active" id="s-login">
+  <div class="login-wrap">
+    <div class="login-logo">
+      <span class="login-logo-icon">🌏</span>
+      <div class="login-title">旅遊管家</div>
+      <div class="login-sub">許小米 家庭旅遊助理</div>
+    </div>
+    <label class="form-label" style="margin-top:0">請輸入密碼</label>
+    <input type="password" id="pwd-input" placeholder="輸入密碼" style="text-align:center;letter-spacing:4px;font-size:18px;" maxlength="10">
+    <div class="error-msg" id="pwd-error"></div>
+    <button class="btn-primary" onclick="doLogin()" style="margin-top:12px;">登入</button>
+    <div class="login-hint">
+      <div style="font-weight:600;margin-bottom:6px;color:#1a1a1a;">試用密碼</div>
+      <div>管理員（秘書）：<strong>1234</strong></div>
+      <div style="margin-top:4px;">查看者（老闆家）：<strong>5678</strong></div>
+    </div>
+  </div>
+</div>
+
+<!-- 首頁總覽 -->
+<div class="screen" id="s-home">
+  <div class="topbar">
+    <div class="topbar-title">🌏 旅遊管家</div>
+    <div class="topbar-right">
+      <span class="mode-badge" id="home-badge"></span>
+      <button class="icon-btn" onclick="doLogout()" title="登出">⎋</button>
+    </div>
+  </div>
+  <div class="content">
+    <div style="display:flex;gap:8px;margin-bottom:16px;">
+      <div class="person-pill active">我的旅遊</div>
+      <div class="person-pill" id="new-trip-btn" onclick="go('s-new-trip')" style="display:none;">＋ 新旅程</div>
+    </div>
+    <div class="section-label" style="margin-top:0;">即將到來</div>
+    <div class="trip-card" onclick="go('s-detail')">
+      <div class="trip-header">
+        <div class="trip-name">日本關西行</div>
+        <div class="trip-date">2026年5月7日 — 5月12日</div>
+        <span class="trip-badge">即將出發</span>
+      </div>
+      <div class="trip-body">
+        <div class="trip-stat">✈️ 3張機票</div>
+        <div class="trip-stat">🏨 1間飯店</div>
+        <div class="trip-stat">🎫 2張票券</div>
+      </div>
+    </div>
+    <div class="section-label">過去旅程</div>
+    <div class="trip-card">
+      <div class="trip-header" style="background:#555;">
+        <div class="trip-name">上海行</div>
+        <div class="trip-date">2026年5月19日 — 5月20日</div>
+        <span class="trip-badge">已完成</span>
+      </div>
+      <div class="trip-body">
+        <div class="trip-stat">✈️ 2張機票</div>
+        <div class="trip-stat">🏨 1間飯店</div>
+      </div>
+    </div>
+  </div>
+  <div class="tab-bar">
+    <button class="tab-item active" onclick="go('s-home')">
+      <svg viewBox="0 0 24 24"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+      總覽
+    </button>
+    <button class="tab-item" onclick="go('s-flight')">
+      <svg viewBox="0 0 24 24"><path d="M21 16v-2l-8-5V3.5a1.5 1.5 0 0 0-3 0V9l-8 5v2l8-2.5V19l-2 1.5V22l3.5-1 3.5 1v-1.5L13 19v-5.5l8 2.5z"/></svg>
+      機票
+    </button>
+    <button class="tab-item" onclick="go('s-hotel')">
+      <svg viewBox="0 0 24 24"><path d="M2 20v-8a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v8"/><path d="M4 10V6a2 2 0 0 1 2-2h12a2 2 0 0 1 2 2v4"/><path d="M12 4v6"/><path d="M2 20h20"/></svg>
+      住宿
+    </button>
+    <button class="tab-item" onclick="go('s-ticket')">
+      <svg viewBox="0 0 24 24"><path d="M2 9a3 3 0 0 1 0 6v2a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2v-2a3 3 0 0 1 0-6V7a2 2 0 0 0-2-2H4a2 2 0 0 0-2 2v2z"/></svg>
+      票券
+    </button>
+    <button class="tab-item" onclick="go('s-timeline')">
+      <svg viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+      行程
+    </button>
+    <button class="tab-item" onclick="go('s-passport')">
+      <svg viewBox="0 0 24 24"><rect x="2" y="5" width="20" height="14" rx="2"/><line x1="2" y1="10" x2="22" y2="10"/></svg>
+      簽證
+    </button>
+  </div>
+</div>
+
+<!-- 旅程詳細 -->
+<div class="screen" id="s-detail">
+  <div class="topbar">
+    <button class="icon-btn" onclick="go('s-home')">←</button>
+    <div class="topbar-title">日本關西行</div>
+    <button class="btn-edit" id="detail-edit-btn" onclick="go('s-new-trip')" style="display:none;">✏️ 編輯</button>
+  </div>
+  <div class="content">
+    <div class="person-row">
+      <div class="person-pill active" onclick="sp(this)">小米</div>
+      <div class="person-pill" onclick="sp(this)">馬哥</div>
+      <div class="person-pill" onclick="sp(this)">Samie</div>
+    </div>
+    <div class="section-label" style="margin-top:0;">個人資料</div>
+    <div class="card clickable" onclick="go('s-flight')">
+      <div class="card-row">
+        <div class="card-icon blue">✈️</div>
+        <div><div class="card-title">CI178 桃園 → 高松</div><div class="card-sub">5/7 14:30・T2・商務艙 12A</div></div>
+        <div class="card-chevron">›</div>
+      </div>
+    </div>
+    <div class="card clickable" onclick="go('s-passport')">
+      <div class="card-row">
+        <div class="card-icon purple">📋</div>
+        <div><div class="card-title">日本觀光簽證</div><div class="card-sub">免簽・有效至護照到期</div></div>
+        <div class="card-chevron">›</div>
+      </div>
+    </div>
+    <div class="card clickable" onclick="go('s-ticket')">
+      <div class="card-row">
+        <div class="card-icon amber">🎫</div>
+        <div><div class="card-title">KidZania 下午場</div><div class="card-sub">5/23 16:00・2大1小</div></div>
+        <div class="card-chevron">›</div>
+      </div>
+    </div>
+    <div class="section-label">共用資料</div>
+    <div class="card clickable" onclick="go('s-hotel')">
+      <div class="card-row">
+        <div class="card-icon green">🏨</div>
+        <div><div class="card-title">大阪麗思卡爾頓</div><div class="card-sub">5/7 Check-in・5/10 Check-out</div></div>
+        <div class="card-chevron">›</div>
+      </div>
+    </div>
+    <div class="card clickable">
+      <div class="card-row">
+        <div class="card-icon coral">🍽️</div>
+        <div><div class="card-title">Kahala 日本料理</div><div class="card-sub">5/8 19:00・3位・確認碼 KH882</div></div>
+        <div class="card-chevron">›</div>
+      </div>
+    </div>
+    <div id="detail-admin-actions" style="display:none;">
+      <div class="spacer"></div>
+      <button class="add-card" onclick="go('s-add-item')">＋ 新增資料</button>
+      <button class="btn-primary" style="display:flex;align-items:center;justify-content:center;gap:8px;">
+        📅 發送至 Google 行事曆
+      </button>
+    </div>
+    <div class="spacer"></div>
+  </div>
+</div>
+
+<!-- 機票 -->
+<div class="screen" id="s-flight">
+  <div class="topbar">
+    <button class="icon-btn" onclick="go('s-detail')">←</button>
+    <div class="topbar-title">機票</div>
+    <button class="btn-edit" id="flight-add-btn" onclick="go('s-add-flight')" style="display:none;">＋ 新增</button>
+  </div>
+  <div class="content">
+    <div class="person-row">
+      <div class="person-pill active" onclick="sp(this)">小米</div>
+      <div class="person-pill" onclick="sp(this)">馬哥</div>
+      <div class="person-pill" onclick="sp(this)">Samie</div>
+    </div>
+    <div class="flight-board">
+      <div class="flight-route">
+        <div class="flight-airport"><div class="flight-code">TPE</div><div class="flight-city">桃園</div><div class="flight-time">14:30</div></div>
+        <div style="opacity:0.4;font-size:24px;">→</div>
+        <div class="flight-airport" style="text-align:right;"><div class="flight-code">TAK</div><div class="flight-city">高松</div><div class="flight-time">18:05</div></div>
+      </div>
+      <div class="flight-info">
+        <span class="flight-tag">CI178</span>
+        <span class="flight-tag">2小時35分</span>
+        <span class="flight-tag">第2航廈</span>
+        <span class="flight-tag">商務艙 12A</span>
+      </div>
+    </div>
+    <div class="card">
+      <div class="field-row"><span class="field-label">機票號碼</span><span class="field-value">297-1234567890</span></div>
+      <div class="field-row"><span class="field-label">訂位代號</span><span class="field-value">ABCXYZ</span></div>
+      <div class="field-row"><span class="field-label">出發時間</span><span class="field-value">5/7 14:30 台灣時間</span></div>
+      <div class="field-row"><span class="field-label">抵達時間</span><span class="field-value">5/7 18:05 日本時間<br><small style="color:#999;font-size:11px;">(台灣時間 17:05)</small></span></div>
+      <div class="field-row"><span class="field-label">金額</span><span class="field-value">TWD 32,958</span></div>
+    </div>
+    <div id="flight-edit-actions" style="display:none;">
+      <div class="btn-row">
+        <button class="btn-edit" style="flex:1;justify-content:center;" onclick="go('s-add-flight')">✏️ 編輯</button>
+        <button class="btn-delete" style="flex:1;justify-content:center;">🗑 刪除</button>
+      </div>
+    </div>
+  </div>
+  <div class="tab-bar">
+    <button class="tab-item" onclick="go('s-home')"><svg viewBox="0 0 24 24"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>總覽</button>
+    <button class="tab-item active" onclick="go('s-flight')"><svg viewBox="0 0 24 24"><path d="M21 16v-2l-8-5V3.5a1.5 1.5 0 0 0-3 0V9l-8 5v2l8-2.5V19l-2 1.5V22l3.5-1 3.5 1v-1.5L13 19v-5.5l8 2.5z"/></svg>機票</button>
+    <button class="tab-item" onclick="go('s-hotel')"><svg viewBox="0 0 24 24"><path d="M2 20v-8a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v8"/><path d="M4 10V6a2 2 0 0 1 2-2h12a2 2 0 0 1 2 2v4"/><path d="M12 4v6"/><path d="M2 20h20"/></svg>住宿</button>
+    <button class="tab-item" onclick="go('s-ticket')"><svg viewBox="0 0 24 24"><path d="M2 9a3 3 0 0 1 0 6v2a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2v-2a3 3 0 0 1 0-6V7a2 2 0 0 0-2-2H4a2 2 0 0 0-2 2v2z"/></svg>票券</button>
+    <button class="tab-item" onclick="go('s-timeline')"><svg viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>行程</button>
+    <button class="tab-item" onclick="go('s-passport')"><svg viewBox="0 0 24 24"><rect x="2" y="5" width="20" height="14" rx="2"/><line x1="2" y1="10" x2="22" y2="10"/></svg>簽證</button>
+  </div>
+</div>
+
+<!-- 新增機票 -->
+<div class="screen" id="s-add-flight">
+  <div class="topbar">
+    <button class="icon-btn" onclick="go('s-flight')">✕</button>
+    <div class="topbar-title">新增機票</div>
+    <div></div>
+  </div>
+  <div class="content">
+    <div class="ocr-zone" onclick="alert('OCR功能：上傳截圖後AI自動辨識帶入欄位')">
+      📷<br>拍照或上傳截圖<br><small style="font-size:11px;">AI 自動辨識帶入欄位</small>
+    </div>
+    <div class="divider">或手動輸入</div>
+    <div class="section-label" style="margin-top:8px;">旅客</div>
+    <div class="person-row">
+      <div class="person-pill active" onclick="sp(this)">小米</div>
+      <div class="person-pill" onclick="sp(this)">馬哥</div>
+      <div class="person-pill" onclick="sp(this)">Samie</div>
+    </div>
+    <label class="form-label">航班號</label><input type="text" placeholder="如：CI178">
+    <label class="form-label">機票號碼</label><input type="text" placeholder="如：297-1234567890">
+    <label class="form-label">出發機場 / 航廈</label>
+    <div class="grid-2"><input type="text" placeholder="機場代碼"><input type="text" placeholder="航廈（如：T2）"></div>
+    <label class="form-label">出發時間（當地）</label><input type="datetime-local">
+    <label class="form-label">抵達機場</label><input type="text" placeholder="機場代碼">
+    <label class="form-label">抵達時間（當地）</label><input type="datetime-local">
+    <label class="form-label">台灣時間備注</label><input type="text" placeholder="如：台灣時間 17:05">
+    <label class="form-label">飛行時間</label><input type="text" placeholder="如：2小時35分">
+    <label class="form-label">座位 / 艙等</label>
+    <div class="grid-2"><input type="text" placeholder="如：12A"><select><option>商務艙</option><option>經濟艙</option><option>頭等艙</option></select></div>
+    <label class="form-label">金額（TWD）</label><input type="number" placeholder="如：32958">
+    <label class="form-label">訂位代號</label><input type="text" placeholder="如：ABCXYZ">
+    <div class="btn-row" style="margin-top:16px;">
+      <button class="btn-secondary" onclick="go('s-flight')" style="flex:1;">取消</button>
+      <button class="btn-primary" onclick="go('s-flight')" style="flex:1;">儲存</button>
+    </div>
+    <div class="spacer"></div>
+  </div>
+</div>
+
+<!-- 住宿 -->
+<div class="screen" id="s-hotel">
+  <div class="topbar">
+    <button class="icon-btn" onclick="go('s-detail')">←</button>
+    <div class="topbar-title">住宿</div>
+    <button class="btn-edit" id="hotel-add-btn" onclick="go('s-add-hotel')" style="display:none;">＋ 新增</button>
+  </div>
+  <div class="content">
+    <div class="card">
+      <div class="card-row" style="margin-bottom:10px;">
+        <div class="card-icon green">🏨</div>
+        <div><div class="card-title">大阪麗思卡爾頓</div><div class="card-sub">5/7 — 5/10・3晚</div></div>
+      </div>
+      <div style="border-top:0.5px solid #f0f0f0;padding-top:10px;">
+        <div class="field-row"><span class="field-label">地址</span><span class="field-value link">📍 大阪市北区梅田3-1-3</span></div>
+        <div class="field-row"><span class="field-label">電話</span><span class="field-value">+81 6-6343-7000</span></div>
+        <div class="field-row"><span class="field-label">Check-in</span><span class="field-value">5/7 15:00</span></div>
+        <div class="field-row"><span class="field-label">Check-out</span><span class="field-value">5/10 12:00</span></div>
+        <div class="field-row"><span class="field-label">確認碼</span><span class="field-value">RC-20260507</span></div>
+        <div class="field-row"><span class="field-label">房型</span><span class="field-value">豪華客房（含早餐）</span></div>
+        <div class="field-row"><span class="field-label">金額</span><span class="field-value">JPY 180,000</span></div>
+        <div class="field-row"><span class="field-label">取消政策</span><span class="field-value">最晚 5/5 免費取消</span></div>
+      </div>
+    </div>
+    <div class="section-label">飯店設施</div>
+    <div class="card">
+      <div class="facility-row">
+        <div class="facility-left">
+          <div class="facility-icon pool">🏊</div>
+          <div><div class="facility-name">泳池</div><div class="facility-detail">3F・06:00–22:00</div></div>
+        </div>
+        <span class="has-badge has-yes">有</span>
+      </div>
+      <div class="facility-row">
+        <div class="facility-left">
+          <div class="facility-icon gym">🏋️</div>
+          <div><div class="facility-name">健身房</div><div class="facility-detail">3F・24小時</div></div>
+        </div>
+        <span class="has-badge has-yes">有</span>
+      </div>
+    </div>
+    <div id="hotel-edit-actions" style="display:none;">
+      <div class="btn-row">
+        <button class="btn-edit" style="flex:1;justify-content:center;" onclick="go('s-add-hotel')">✏️ 編輯</button>
+        <button class="btn-delete" style="flex:1;justify-content:center;">🗑 刪除</button>
+      </div>
+    </div>
+  </div>
+  <div class="tab-bar">
+    <button class="tab-item" onclick="go('s-home')"><svg viewBox="0 0 24 24"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>總覽</button>
+    <button class="tab-item" onclick="go('s-flight')"><svg viewBox="0 0 24 24"><path d="M21 16v-2l-8-5V3.5a1.5 1.5 0 0 0-3 0V9l-8 5v2l8-2.5V19l-2 1.5V22l3.5-1 3.5 1v-1.5L13 19v-5.5l8 2.5z"/></svg>機票</button>
+    <button class="tab-item active" onclick="go('s-hotel')"><svg viewBox="0 0 24 24"><path d="M2 20v-8a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v8"/><path d="M4 10V6a2 2 0 0 1 2-2h12a2 2 0 0 1 2 2v4"/><path d="M12 4v6"/><path d="M2 20h20"/></svg>住宿</button>
+    <button class="tab-item" onclick="go('s-ticket')"><svg viewBox="0 0 24 24"><path d="M2 9a3 3 0 0 1 0 6v2a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2v-2a3 3 0 0 1 0-6V7a2 2 0 0 0-2-2H4a2 2 0 0 0-2 2v2z"/></svg>票券</button>
+    <button class="tab-item" onclick="go('s-timeline')"><svg viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>行程</button>
+    <button class="tab-item" onclick="go('s-passport')"><svg viewBox="0 0 24 24"><rect x="2" y="5" width="20" height="14" rx="2"/><line x1="2" y1="10" x2="22" y2="10"/></svg>簽證</button>
+  </div>
+</div>
+
+<!-- 新增住宿 -->
+<div class="screen" id="s-add-hotel">
+  <div class="topbar">
+    <button class="icon-btn" onclick="go('s-hotel')">✕</button>
+    <div class="topbar-title">新增住宿</div>
+    <div></div>
+  </div>
+  <div class="content">
+    <div class="ocr-zone" onclick="alert('OCR功能：上傳截圖後AI自動辨識帶入欄位')">
+      📷<br>上傳訂房確認截圖<br><small style="font-size:11px;">AI 自動辨識帶入欄位</small>
+    </div>
+    <div class="divider">或手動輸入</div>
+    <label class="form-label" style="margin-top:8px;">飯店名稱</label><input type="text" placeholder="如：大阪麗思卡爾頓">
+    <label class="form-label">地址（連結 Google Map）</label><input type="text" placeholder="輸入地址">
+    <label class="form-label">電話</label><input type="tel" placeholder="飯店電話">
+    <label class="form-label">Check-in / Check-out</label>
+    <div class="grid-2"><input type="datetime-local"><input type="datetime-local"></div>
+    <label class="form-label">確認碼</label><input type="text" placeholder="訂房確認碼">
+    <label class="form-label">房型</label><input type="text" placeholder="如：豪華客房（含早餐）">
+    <label class="form-label">金額</label><input type="text" placeholder="如：JPY 180,000">
+    <label class="form-label">取消政策</label><input type="text" placeholder="如：最晚 5/5 免費取消">
+    <div class="section-label">飯店設施</div>
+    <div class="card">
+      <div class="toggle-row">
+        <div class="toggle-label">🏊 泳池</div>
+        <button class="toggle on" id="pool-toggle" onclick="toggleFacility('pool')"></button>
+      </div>
+      <div class="expand-fields open" id="pool-fields">
+        <div class="grid-2" style="padding:8px 0 4px;">
+          <div><label class="form-label" style="margin-top:0;">樓層</label><input type="text" placeholder="如：3F"></div>
+          <div><label class="form-label" style="margin-top:0;">開放時間</label><input type="text" placeholder="如：06:00–22:00"></div>
+        </div>
+      </div>
+      <div class="toggle-row">
+        <div class="toggle-label">🏋️ 健身房</div>
+        <button class="toggle on" id="gym-toggle" onclick="toggleFacility('gym')"></button>
+      </div>
+      <div class="expand-fields open" id="gym-fields">
+        <div class="grid-2" style="padding:8px 0 4px;">
+          <div><label class="form-label" style="margin-top:0;">樓層</label><input type="text" placeholder="如：3F"></div>
+          <div><label class="form-label" style="margin-top:0;">開放時間</label><input type="text" placeholder="如：24小時"></div>
+        </div>
+      </div>
+    </div>
+    <label class="form-label">備注</label>
+    <textarea placeholder="其他備注..." style="height:72px;"></textarea>
+    <div class="btn-row" style="margin-top:12px;">
+      <button class="btn-secondary" onclick="go('s-hotel')" style="flex:1;">取消</button>
+      <button class="btn-primary" onclick="go('s-hotel')" style="flex:1;">儲存</button>
+    </div>
+    <div class="spacer"></div>
+  </div>
+</div>
+
+<!-- 票券 -->
+<div class="screen" id="s-ticket">
+  <div class="topbar">
+    <button class="icon-btn" onclick="go('s-detail')">←</button>
+    <div class="topbar-title">票券</div>
+    <button class="btn-edit" id="ticket-add-btn" style="display:none;">＋ 新增</button>
+  </div>
+  <div class="content">
+    <div class="person-row">
+      <div class="person-pill active" onclick="sp(this)">全部</div>
+      <div class="person-pill" onclick="sp(this)">小米</div>
+      <div class="person-pill" onclick="sp(this)">馬哥</div>
+      <div class="person-pill" onclick="sp(this)">Samie</div>
+    </div>
+    <div class="card">
+      <div class="card-row" style="margin-bottom:10px;">
+        <div class="card-icon amber">🎫</div>
+        <div><div class="card-title">KidZania 下午場</div><div class="card-sub">2大1小・5/23 16:00–21:00</div></div>
+      </div>
+      <div style="border-top:0.5px solid #f0f0f0;padding-top:10px;">
+        <div class="field-row"><span class="field-label">地點</span><span class="field-value link">📍 Kidzania Koshien</span></div>
+        <div class="field-row"><span class="field-label">日本時間</span><span class="field-value">16:00–21:00</span></div>
+        <div class="field-row"><span class="field-label">台灣時間</span><span class="field-value" style="color:#999;">15:00–20:00</span></div>
+        <div class="field-row"><span class="field-label">票券號碼</span><span class="field-value">KZ-88291</span></div>
+        <div class="field-row"><span class="field-label">金額</span><span class="field-value">JPY 12,800</span></div>
+      </div>
+    </div>
+    <div id="ticket-edit-actions" style="display:none;">
+      <div class="btn-row">
+        <button class="btn-edit" style="flex:1;justify-content:center;">✏️ 編輯</button>
+        <button class="btn-delete" style="flex:1;justify-content:center;">🗑 刪除</button>
+      </div>
+    </div>
+  </div>
+  <div class="tab-bar">
+    <button class="tab-item" onclick="go('s-home')"><svg viewBox="0 0 24 24"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>總覽</button>
+    <button class="tab-item" onclick="go('s-flight')"><svg viewBox="0 0 24 24"><path d="M21 16v-2l-8-5V3.5a1.5 1.5 0 0 0-3 0V9l-8 5v2l8-2.5V19l-2 1.5V22l3.5-1 3.5 1v-1.5L13 19v-5.5l8 2.5z"/></svg>機票</button>
+    <button class="tab-item" onclick="go('s-hotel')"><svg viewBox="0 0 24 24"><path d="M2 20v-8a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v8"/><path d="M4 10V6a2 2 0 0 1 2-2h12a2 2 0 0 1 2 2v4"/><path d="M12 4v6"/><path d="M2 20h20"/></svg>住宿</button>
+    <button class="tab-item active" onclick="go('s-ticket')"><svg viewBox="0 0 24 24"><path d="M2 9a3 3 0 0 1 0 6v2a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2v-2a3 3 0 0 1 0-6V7a2 2 0 0 0-2-2H4a2 2 0 0 0-2 2v2z"/></svg>票券</button>
+    <button class="tab-item" onclick="go('s-timeline')"><svg viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>行程</button>
+    <button class="tab-item" onclick="go('s-passport')"><svg viewBox="0 0 24 24"><rect x="2" y="5" width="20" height="14" rx="2"/><line x1="2" y1="10" x2="22" y2="10"/></svg>簽證</button>
+  </div>
+</div>
+
+<!-- 行程時間軸 -->
+<div class="screen" id="s-timeline">
+  <div class="topbar">
+    <button class="icon-btn" onclick="go('s-detail')">←</button>
+    <div class="topbar-title">行程時間軸</div>
+    <div></div>
+  </div>
+  <div class="content">
+    <div class="section-label" style="margin-top:0;">5月7日（星期四）</div>
+    <div class="timeline-item">
+      <div class="tl-left"><div class="tl-time">14:30</div><div class="tl-dot" style="background:#1565c0;"></div><div class="tl-line"></div></div>
+      <div><div class="tl-title">CI178 出發</div><div class="tl-sub">桃園 T2 → 高松・商務艙</div></div>
+    </div>
+    <div class="timeline-item">
+      <div class="tl-left"><div class="tl-time">18:05</div><div class="tl-dot" style="background:#1565c0;"></div><div class="tl-line"></div></div>
+      <div><div class="tl-title">抵達高松機場</div><div class="tl-sub">台灣時間 17:05</div></div>
+    </div>
+    <div class="timeline-item">
+      <div class="tl-left"><div class="tl-time">15:00</div><div class="tl-dot" style="background:#2e7d32;"></div><div class="tl-line"></div></div>
+      <div><div class="tl-title">大阪麗思卡爾頓 Check-in</div><div class="tl-sub">豪華客房・RC-20260507</div></div>
+    </div>
+    <div class="section-label">5月8日（星期五）</div>
+    <div class="timeline-item">
+      <div class="tl-left"><div class="tl-time">19:00</div><div class="tl-dot" style="background:#bf360c;"></div><div class="tl-line"></div></div>
+      <div><div class="tl-title">Kahala 日本料理晚餐</div><div class="tl-sub">3位・確認碼 KH882</div></div>
+    </div>
+    <div class="section-label">5月23日（星期六）</div>
+    <div class="timeline-item">
+      <div class="tl-left"><div class="tl-time">16:00</div><div class="tl-dot" style="background:#e65100;"></div><div class="tl-line"></div></div>
+      <div><div class="tl-title">KidZania 下午場</div><div class="tl-sub">Koshien・台灣時間 15:00</div></div>
+    </div>
+  </div>
+  <div class="tab-bar">
+    <button class="tab-item" onclick="go('s-home')"><svg viewBox="0 0 24 24"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>總覽</button>
+    <button class="tab-item" onclick="go('s-flight')"><svg viewBox="0 0 24 24"><path d="M21 16v-2l-8-5V3.5a1.5 1.5 0 0 0-3 0V9l-8 5v2l8-2.5V19l-2 1.5V22l3.5-1 3.5 1v-1.5L13 19v-5.5l8 2.5z"/></svg>機票</button>
+    <button class="tab-item" onclick="go('s-hotel')"><svg viewBox="0 0 24 24"><path d="M2 20v-8a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v8"/><path d="M4 10V6a2 2 0 0 1 2-2h12a2 2 0 0 1 2 2v4"/><path d="M12 4v6"/><path d="M2 20h20"/></svg>住宿</button>
+    <button class="tab-item" onclick="go('s-ticket')"><svg viewBox="0 0 24 24"><path d="M2 9a3 3 0 0 1 0 6v2a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2v-2a3 3 0 0 1 0-6V7a2 2 0 0 0-2-2H4a2 2 0 0 0-2 2v2z"/></svg>票券</button>
+    <button class="tab-item active" onclick="go('s-timeline')"><svg viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>行程</button>
+    <button class="tab-item" onclick="go('s-passport')"><svg viewBox="0 0 24 24"><rect x="2" y="5" width="20" height="14" rx="2"/><line x1="2" y1="10" x2="22" y2="10"/></svg>簽證</button>
+  </div>
+</div>
+
+<!-- 簽證護照 -->
+<div class="screen" id="s-passport">
+  <div class="topbar">
+    <button class="icon-btn" onclick="go('s-detail')">←</button>
+    <div class="topbar-title">簽證 ＆ 護照</div>
+    <button class="btn-edit" id="passport-add-btn" style="display:none;">＋ 新增</button>
+  </div>
+  <div class="content">
+    <div class="person-row">
+      <div class="person-pill active" onclick="sp(this)">小米</div>
+      <div class="person-pill" onclick="sp(this)">馬哥</div>
+      <div class="person-pill" onclick="sp(this)">Samie</div>
+    </div>
+    <div class="section-label" style="margin-top:0;">護照</div>
+    <div class="passport-card">
+      <div style="display:flex;justify-content:space-between;align-items:flex-start;">
+        <div><div class="passport-name">許書綺</div><div class="passport-sub">REPUBLIC OF CHINA</div></div>
+        <span style="font-size:28px;opacity:0.5;">🛂</span>
+      </div>
+      <div class="passport-fields">
+        <div class="passport-field"><label>護照號碼</label><p>A123456789</p></div>
+        <div class="passport-field"><label>有效期限</label><p>2029/08/15</p></div>
+      </div>
+    </div>
+    <div class="section-label">簽證</div>
+    <div class="passport-card" style="background:#2d2d5e;">
+      <div style="display:flex;justify-content:space-between;align-items:flex-start;">
+        <div><div class="passport-name">日本觀光簽證</div><div class="passport-sub">免簽・90天</div></div>
+        <span style="font-size:22px;color:#81c784;">✓</span>
+      </div>
+      <div class="passport-fields">
+        <div class="passport-field"><label>入境次數</label><p>多次</p></div>
+        <div class="passport-field"><label>有效期限</label><p>與護照同</p></div>
+      </div>
+    </div>
+    <div class="warn-box">⚠️ 護照將於 3 年後到期，請注意更新</div>
+    <div style="height:12px;"></div>
+    <button class="btn-secondary" style="width:100%;display:flex;align-items:center;justify-content:center;gap:8px;margin-bottom:8px;">📱 顯示 QR 碼</button>
+    <div id="passport-edit-actions" style="display:none;">
+      <div class="btn-row">
+        <button class="btn-edit" style="flex:1;justify-content:center;">✏️ 編輯</button>
+        <button class="btn-delete" style="flex:1;justify-content:center;">🗑 刪除</button>
+      </div>
+      <div style="height:8px;"></div>
+      <button class="btn-secondary" style="width:100%;display:flex;align-items:center;justify-content:center;gap:8px;">🔔 設定到期提醒</button>
+    </div>
+  </div>
+  <div class="tab-bar">
+    <button class="tab-item" onclick="go('s-home')"><svg viewBox="0 0 24 24"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>總覽</button>
+    <button class="tab-item" onclick="go('s-flight')"><svg viewBox="0 0 24 24"><path d="M21 16v-2l-8-5V3.5a1.5 1.5 0 0 0-3 0V9l-8 5v2l8-2.5V19l-2 1.5V22l3.5-1 3.5 1v-1.5L13 19v-5.5l8 2.5z"/></svg>機票</button>
+    <button class="tab-item" onclick="go('s-hotel')"><svg viewBox="0 0 24 24"><path d="M2 20v-8a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v8"/><path d="M4 10V6a2 2 0 0 1 2-2h12a2 2 0 0 1 2 2v4"/><path d="M12 4v6"/><path d="M2 20h20"/></svg>住宿</button>
+    <button class="tab-item" onclick="go('s-ticket')"><svg viewBox="0 0 24 24"><path d="M2 9a3 3 0 0 1 0 6v2a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2v-2a3 3 0 0 1 0-6V7a2 2 0 0 0-2-2H4a2 2 0 0 0-2 2v2z"/></svg>票券</button>
+    <button class="tab-item" onclick="go('s-timeline')"><svg viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>行程</button>
+    <button class="tab-item active" onclick="go('s-passport')"><svg viewBox="0 0 24 24"><rect x="2" y="5" width="20" height="14" rx="2"/><line x1="2" y1="10" x2="22" y2="10"/></svg>簽證</button>
+  </div>
+</div>
+
+<!-- 新增旅程 -->
+<div class="screen" id="s-new-trip">
+  <div class="topbar">
+    <button class="icon-btn" onclick="go('s-home')">✕</button>
+    <div class="topbar-title">新增旅程</div>
+    <div></div>
+  </div>
+  <div class="content">
+    <label class="form-label" style="margin-top:0;">旅程名稱</label><input type="text" placeholder="如：日本關西行">
+    <label class="form-label">目的地</label><input type="text" placeholder="如：日本・大阪">
+    <label class="form-label">出發 / 返回日期</label>
+    <div class="grid-2"><input type="date"><input type="date"></div>
+    <div class="section-label">旅客</div>
+    <div class="card" style="margin-bottom:8px;">
+      <div class="card-row"><div style="width:32px;height:32px;border-radius:50%;background:#e3f2fd;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:600;color:#1565c0;">小米</div><div style="font-size:13px;font-weight:600;">許書綺（小米）</div><div style="margin-left:auto;color:#2e7d32;">✓</div></div>
+    </div>
+    <div class="card" style="margin-bottom:8px;">
+      <div class="card-row"><div style="width:32px;height:32px;border-radius:50%;background:#fff8e1;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:600;color:#e65100;">馬哥</div><div style="font-size:13px;font-weight:600;">倪子鈞（馬哥）</div><div style="margin-left:auto;color:#2e7d32;">✓</div></div>
+    </div>
+    <div class="card" style="margin-bottom:8px;">
+      <div class="card-row"><div style="width:32px;height:32px;border-radius:50%;background:#e8f5e9;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:600;color:#2e7d32;">Sa</div><div style="font-size:13px;font-weight:600;">倪希米（Samie）</div><div style="margin-left:auto;color:#2e7d32;">✓</div></div>
+    </div>
+    <div class="btn-row" style="margin-top:16px;">
+      <button class="btn-secondary" onclick="go('s-home')" style="flex:1;">取消</button>
+      <button class="btn-primary" onclick="go('s-home')" style="flex:1;">建立旅程</button>
+    </div>
+    <div class="spacer"></div>
+  </div>
+</div>
+
+<!-- 新增項目選擇 -->
+<div class="screen" id="s-add-item">
+  <div class="topbar">
+    <button class="icon-btn" onclick="go('s-detail')">✕</button>
+    <div class="topbar-title">新增資料</div>
+    <div></div>
+  </div>
+  <div class="content">
+    <div class="section-label" style="margin-top:0;">選擇類型</div>
+    <div class="card clickable" onclick="go('s-add-flight')"><div class="card-row"><div class="card-icon blue">✈️</div><div><div class="card-title">機票</div><div class="card-sub">新增航班資訊</div></div><div class="card-chevron">›</div></div></div>
+    <div class="card clickable" onclick="go('s-add-hotel')"><div class="card-row"><div class="card-icon green">🏨</div><div><div class="card-title">住宿</div><div class="card-sub">新增飯店訂房</div></div><div class="card-chevron">›</div></div></div>
+    <div class="card clickable"><div class="card-row"><div class="card-icon coral">🍽️</div><div><div class="card-title">餐廳</div><div class="card-sub">新增餐廳訂位</div></div><div class="card-chevron">›</div></div></div>
+    <div class="card clickable"><div class="card-row"><div class="card-icon amber">🎫</div><div><div class="card-title">票券</div><div class="card-sub">新增景點票券</div></div><div class="card-chevron">›</div></div></div>
+    <div class="card clickable"><div class="card-row"><div class="card-icon purple">📋</div><div><div class="card-title">簽證／護照</div><div class="card-sub">新增簽證資料</div></div><div class="card-chevron">›</div></div></div>
+  </div>
+</div>
+
+<script>
+const CLIENT_ID = '1076023430172-89l58tgg1i0sqloc5pdbspqmg86cirrh.apps.googleusercontent.com';
+const ADMIN_PWD = '1234';
+const VIEW_PWD = '5678';
+let isAdmin = false;
+
+function go(id) {
+  document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+  const t = document.getElementById(id);
+  if (t) { t.classList.add('active'); window.scrollTo(0,0); }
+}
+
+function sp(el) {
+  el.closest('.person-row').querySelectorAll('.person-pill').forEach(p => p.classList.remove('active'));
+  el.classList.add('active');
+}
+
+function show(id, v) {
+  const el = document.getElementById(id);
+  if (el) el.style.display = v ? '' : 'none';
+}
+
+function applyMode() {
+  const badge = document.getElementById('home-badge');
+  if (isAdmin) {
+    badge.textContent = '管理員';
+    badge.className = 'mode-badge mode-admin';
+  } else {
+    badge.textContent = '查看模式';
+    badge.className = 'mode-badge mode-view';
+  }
+  show('new-trip-btn', isAdmin);
+  show('detail-edit-btn', isAdmin);
+  show('detail-admin-actions', isAdmin);
+  show('flight-add-btn', isAdmin);
+  show('flight-edit-actions', isAdmin);
+  show('hotel-add-btn', isAdmin);
+  show('hotel-edit-actions', isAdmin);
+  show('ticket-add-btn', isAdmin);
+  show('ticket-edit-actions', isAdmin);
+  show('passport-add-btn', isAdmin);
+  show('passport-edit-actions', isAdmin);
+}
+
+function doLogin() {
+  const pwd = document.getElementById('pwd-input').value;
+  const err = document.getElementById('pwd-error');
+  if (pwd === ADMIN_PWD) {
+    isAdmin = true; applyMode(); go('s-home'); err.textContent = '';
+  } else if (pwd === VIEW_PWD) {
+    isAdmin = false; applyMode(); go('s-home'); err.textContent = '';
+  } else {
+    err.textContent = '密碼錯誤，請再試一次';
+  }
+}
+
+function doLogout() {
+  isAdmin = false;
+  document.getElementById('pwd-input').value = '';
+  document.getElementById('pwd-error').textContent = '';
+  go('s-login');
+}
+
+function toggleFacility(type) {
+  const toggle = document.getElementById(type + '-toggle');
+  const fields = document.getElementById(type + '-fields');
+  const isOn = toggle.classList.contains('on');
+  toggle.classList.toggle('on', !isOn);
+  fields.classList.toggle('open', !isOn);
+}
+
+document.getElementById('pwd-input').addEventListener('keydown', function(e) {
+  if (e.key === 'Enter') doLogin();
+});
+</script>
+</body>
+</html>
