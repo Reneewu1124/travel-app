@@ -1,0 +1,22 @@
+{
+  "name": "Travel",
+  "short_name": "Travel",
+  "description": "許小米家庭旅遊助理",
+  "start_url": "/travel-app/",
+  "display": "standalone",
+  "background_color": "#A8DADC",
+  "theme_color": "#A8DADC",
+  "orientation": "portrait",
+  "icons": [
+    {
+      "src": "icon.png",
+      "sizes": "192x192",
+      "type": "image/png"
+    },
+    {
+      "src": "icon.png",
+      "sizes": "512x512",
+      "type": "image/png"
+    }
+  ]
+}
