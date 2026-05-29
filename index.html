@@ -25,8 +25,8 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Helvetica Neue',Arial,sans-se
 .icon-btn{background:none;border:none;cursor:pointer;color:#666;font-size:20px;padding:4px;display:flex;align-items:center;}
 
 /* 底部導覽 */
-.tab-bar{display:flex;border-top:0.5px solid #e5e5e5;padding:8px 0 env(safe-area-inset-bottom, 12px) 0;background:#fff;position:sticky;bottom:0;width:100%;}
-.tab-item{flex:1;display:flex;flex-direction:column;align-items:center;gap:2px;cursor:pointer;color:#999;font-size:9px;border:none;background:none;padding:4px 0;min-width:0;overflow:hidden;white-space:nowrap;}
+.tab-bar{display:flex;border-top:0.5px solid #e5e5e5;padding:8px 0 env(safe-area-inset-bottom,12px);background:#fff;position:sticky;bottom:0;width:100%;padding-left:env(safe-area-inset-left,0);padding-right:env(safe-area-inset-right,0);}
+.tab-item{flex:1;display:flex;flex-direction:column;align-items:center;gap:2px;cursor:pointer;color:#999;font-size:9px;border:none;background:none;padding:4px 2px;min-width:0;overflow:hidden;}
 .tab-item.active{color:#1a1a1a;}
 .tab-item svg{width:22px;height:22px;stroke:currentColor;fill:none;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round;}
 
@@ -403,7 +403,7 @@ textarea{resize:none;}
     <label class="form-label">訂位代號</label><input type="text" placeholder="如：ABCXYZ">
     <div class="btn-row" style="margin-top:16px;">
       <button class="btn-secondary" onclick="go('s-flight')" style="flex:1;">取消</button>
-      <button class="btn-primary" onclick="go('s-flight')" style="flex:1;">儲存</button>
+      <button class="btn-primary" onclick="saveFlight()" style="flex:1;">儲存</button>
     </div>
     <div class="spacer"></div>
   </div>
@@ -515,7 +515,7 @@ textarea{resize:none;}
     <textarea placeholder="其他備注..." style="height:72px;"></textarea>
     <div class="btn-row" style="margin-top:12px;">
       <button class="btn-secondary" onclick="go('s-hotel')" style="flex:1;">取消</button>
-      <button class="btn-primary" onclick="go('s-hotel')" style="flex:1;">儲存</button>
+      <button class="btn-primary" onclick="saveHotel()" style="flex:1;">儲存</button>
     </div>
     <div class="spacer"></div>
   </div>
@@ -688,7 +688,7 @@ textarea{resize:none;}
     </div>
     <div class="btn-row" style="margin-top:16px;">
       <button class="btn-secondary" onclick="go('s-home')" style="flex:1;">取消</button>
-      <button class="btn-primary" onclick="go('s-home')" style="flex:1;">建立旅程</button>
+      <button class="btn-primary" onclick="saveTrip()" style="flex:1;">建立旅程</button>
     </div>
     <div class="spacer"></div>
   </div>
@@ -809,6 +809,59 @@ function toggleFacility(type) {
 document.getElementById('pwd-input').addEventListener('keydown', function(e) {
   if (e.key === 'Enter') doLogin();
 });
+
+async function saveTrip() {
+  const inputs = document.querySelectorAll('#s-new-trip input');
+  const name = inputs[0].value;
+  const dest = inputs[1].value;
+  const start = inputs[2].value;
+  const end = inputs[3].value;
+  if(!name){ alert('請填寫旅程名稱'); return; }
+  const id = Date.now();
+  const ok = await saveToSheet('旅程', [id, name, dest, start, end]);
+  if(ok){ alert('旅程建立成功！'); go('s-home'); }
+}
+
+async function saveFlight() {
+  const inputs = document.querySelectorAll('#s-add-flight input, #s-add-flight select');
+  const person = document.querySelector('#s-add-flight .person-pill.active')?.textContent || '';
+  const flight = inputs[0].value;
+  const ticketNo = inputs[1].value;
+  const depAirport = inputs[2].value;
+  const terminal = inputs[3].value;
+  const depTime = inputs[4].value;
+  const arrAirport = inputs[5].value;
+  const arrTime = inputs[6].value;
+  const twTime = inputs[7].value;
+  const duration = inputs[8].value;
+  const seat = inputs[9].value;
+  const cabin = document.querySelector('#s-add-flight select')?.value || '';
+  const price = inputs[10]?.value || '';
+  const pnr = inputs[11]?.value || '';
+  if(!flight){ alert('請填寫航班號'); return; }
+  const id = Date.now();
+  const ok = await saveToSheet('機票', [id, 1, person, flight, ticketNo, depAirport, depTime, arrAirport, arrTime, twTime, duration, terminal, seat, cabin, price, pnr]);
+  if(ok){ alert('機票新增成功！'); go('s-flight'); }
+}
+
+async function saveHotel() {
+  const inputs = document.querySelectorAll('#s-add-hotel input');
+  const hotelName = inputs[0].value;
+  const address = inputs[1].value;
+  const phone = inputs[2].value;
+  const checkin = inputs[3].value;
+  const checkout = inputs[4].value;
+  const confirmCode = inputs[5].value;
+  const roomType = inputs[6].value;
+  const price = inputs[7].value;
+  const cancel = inputs[8].value;
+  const poolOn = document.getElementById('pool-toggle')?.classList.contains('on');
+  const gymOn = document.getElementById('gym-toggle')?.classList.contains('on');
+  if(!hotelName){ alert('請填寫飯店名稱'); return; }
+  const id = Date.now();
+  const ok = await saveToSheet('住宿', [id, 1, hotelName, address, phone, checkin, checkout, confirmCode, roomType, price, cancel, poolOn?'有':'無', '', '', gymOn?'有':'無', '', '']);
+  if(ok){ alert('住宿新增成功！'); go('s-hotel'); }
+}
 </script>
 </body>
 </html>
