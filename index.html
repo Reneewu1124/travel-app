@@ -653,15 +653,37 @@ async function saveToSheet(sheetName, row) {
   }
 }
 
+
+// 快取系統
+const cache = {};
+const CACHE_TIME = 5 * 60 * 1000; // 5分鐘
+
 async function loadFromSheet(sheetName) {
+  const key = sheetName + '_' + (currentTripId || '');
+  const now = Date.now();
+  
+  // 有快取且未過期就直接回傳
+  if(cache[key] && (now - cache[key].time) < CACHE_TIME) {
+    return cache[key].data;
+  }
+  
   try {
     const res = await fetch(SCRIPT_URL + '?sheet=' + sheetName);
     const data = await res.json();
-    return data.data || [];
+    const rows = data.data || [];
+    
+    // 存入快取
+    cache[key] = { data: rows, time: now };
+    return rows;
   } catch(e) {
     return [];
   }
 }
+
+function clearCache() {
+  Object.keys(cache).forEach(k => delete cache[k]);
+}
+
 const ADMIN_PWD = '1234';
 const VIEW_PWD = '5678';
 let isAdmin = false;
@@ -994,7 +1016,7 @@ async function saveTrip() {
   if(!name){ alert('請填寫旅程名稱'); return; }
   const id = Date.now();
   const ok = await saveToSheet('旅程', [id, name, dest, start, end]);
-  if(ok){ alert('旅程建立成功！'); go('s-home'); loadTrips(); }
+  if(ok){ clearCache(); alert('旅程建立成功！'); go('s-home'); loadTrips(); }
 }
 
 async function saveFlight() {
@@ -1016,7 +1038,7 @@ async function saveFlight() {
   if(!flight){ alert('請填寫航班號'); return; }
   const id = Date.now();
   const ok = await saveToSheet('機票', [id, 1, person, flight, ticketNo, depAirport, depTime, arrAirport, arrTime, twTime, duration, terminal, seat, cabin, price, pnr]);
-  if(ok){ alert('機票新增成功！'); go('s-flight'); loadFlights(); }
+  if(ok){ clearCache(); alert('機票新增成功！'); go('s-flight'); loadFlights(); }
 }
 
 async function saveHotel() {
@@ -1035,7 +1057,7 @@ async function saveHotel() {
   if(!hotelName){ alert('請填寫飯店名稱'); return; }
   const id = Date.now();
   const ok = await saveToSheet('住宿', [id, 1, hotelName, address, phone, checkin, checkout, confirmCode, roomType, price, cancel, poolOn?'有':'無', '', '', gymOn?'有':'無', '', '']);
-  if(ok){ alert('住宿新增成功！'); go('s-hotel'); }
+  if(ok){ clearCache(); alert('住宿新增成功！'); go('s-hotel'); }
 }
 </script>
 </body>
