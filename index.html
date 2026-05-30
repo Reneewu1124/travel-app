@@ -205,31 +205,8 @@ textarea{resize:none;}
       <div class="person-pill active">我的旅遊</div>
       <div class="person-pill" id="new-trip-btn" onclick="go('s-new-trip')" style="display:none;">＋ 新旅程</div>
     </div>
-    <div class="section-label" style="margin-top:0;">即將到來</div>
-    <div class="trip-card" onclick="go('s-detail')">
-      <div class="trip-header">
-        <div class="trip-name">日本關西行</div>
-        <div class="trip-date">2026年5月7日 — 5月12日</div>
-        <span class="trip-badge">即將出發</span>
-      </div>
-      <div class="trip-body">
-        <div class="trip-stat">✈️ 3張機票</div>
-        <div class="trip-stat">🏨 1間飯店</div>
-        <div class="trip-stat">🎫 2張票券</div>
-      </div>
-    </div>
-    <div class="section-label">過去旅程</div>
-    <div class="trip-card">
-      <div class="trip-header" style="background:#555;">
-        <div class="trip-name">上海行</div>
-        <div class="trip-date">2026年5月19日 — 5月20日</div>
-        <span class="trip-badge">已完成</span>
-      </div>
-      <div class="trip-body">
-        <div class="trip-stat">✈️ 2張機票</div>
-        <div class="trip-stat">🏨 1間飯店</div>
-      </div>
-    </div>
+    <div id="trips-loading" style="text-align:center;padding:32px;color:#999;font-size:14px;">載入中...</div>
+    <div id="trips-container"></div>
   </div>
   <div class="tab-bar">
     <button class="tab-item active" onclick="go('s-home')">
@@ -783,9 +760,9 @@ function doLogin() {
   const pwd = document.getElementById('pwd-input').value;
   const err = document.getElementById('pwd-error');
   if (pwd === ADMIN_PWD) {
-    isAdmin = true; applyMode(); go('s-home'); err.textContent = '';
+    isAdmin = true; applyMode(); go('s-home'); err.textContent = ''; loadTrips();
   } else if (pwd === VIEW_PWD) {
-    isAdmin = false; applyMode(); go('s-home'); err.textContent = '';
+    isAdmin = false; applyMode(); go('s-home'); err.textContent = ''; loadTrips();
   } else {
     err.textContent = '密碼錯誤，請再試一次';
   }
@@ -810,6 +787,83 @@ document.getElementById('pwd-input').addEventListener('keydown', function(e) {
   if (e.key === 'Enter') doLogin();
 });
 
+
+var currentTripId = null;
+var currentTripName = null;
+
+async function loadTrips() {
+  const container = document.getElementById('trips-container');
+  const loading = document.getElementById('trips-loading');
+  if(!container) return;
+  
+  try {
+    const rows = await loadFromSheet('旅程');
+    if(loading) loading.style.display = 'none';
+    
+    // Skip header row
+    const trips = rows.slice(1).filter(r => r[0]);
+    
+    if(trips.length === 0) {
+      container.innerHTML = '<div style="text-align:center;padding:48px 20px;color:#ccc;"><div style="font-size:48px;margin-bottom:12px;">🗺️</div><p style="font-size:14px;">還沒有旅程<br>按「＋ 新旅程」開始吧！</p></div>';
+      return;
+    }
+    
+    const today = new Date();
+    let upcomingHTML = '';
+    let pastHTML = '';
+    let upcomingCount = 0;
+    let pastCount = 0;
+    
+    trips.reverse().forEach(row => {
+      const id = row[0];
+      const name = row[1] || '';
+      const dest = row[2] || '';
+      const startDate = row[3] ? new Date(row[3]) : null;
+      const endDate = row[4] ? new Date(row[4]) : null;
+      
+      const formatDate = (d) => {
+        if(!d) return '';
+        return d.getFullYear() + '年' + (d.getMonth()+1) + '月' + d.getDate() + '日';
+      };
+      
+      const dateStr = startDate && endDate ? formatDate(startDate) + ' — ' + formatDate(endDate) : dest;
+      const isPast = endDate && endDate < today;
+      const bg = isPast ? '#555' : '#1a1a1a';
+      const badge = isPast ? '已完成' : '即將出發';
+      
+      const card = \`<div class="trip-card" onclick="selectTrip('\${id}','\${name.replace(/'/g,"\\'")}')">
+        <div class="trip-header" style="background:\${bg};">
+          <div class="trip-name">\${name}</div>
+          <div class="trip-date">\${dateStr}</div>
+          <span class="trip-badge">\${badge}</span>
+        </div>
+        <div class="trip-body">
+          <div class="trip-stat">📍 \${dest}</div>
+        </div>
+      </div>\`;
+      
+      if(isPast) { pastHTML += card; pastCount++; }
+      else { upcomingHTML += card; upcomingCount++; }
+    });
+    
+    let html = '';
+    if(upcomingCount > 0) html += '<div class="section-label" style="margin-top:0;">即將到來</div>' + upcomingHTML;
+    if(pastCount > 0) html += '<div class="section-label">過去旅程</div>' + pastHTML;
+    container.innerHTML = html;
+    
+  } catch(e) {
+    if(loading) loading.style.display = 'none';
+    container.innerHTML = '<div style="text-align:center;padding:32px;color:#999;font-size:13px;">載入失敗，請重新整理</div>';
+  }
+}
+
+function selectTrip(id, name) {
+  currentTripId = id;
+  currentTripName = name;
+  document.querySelector('#s-detail .topbar-title').textContent = name;
+  go('s-detail');
+}
+
 async function saveTrip() {
   const inputs = document.querySelectorAll('#s-new-trip input');
   const name = inputs[0].value;
@@ -819,7 +873,7 @@ async function saveTrip() {
   if(!name){ alert('請填寫旅程名稱'); return; }
   const id = Date.now();
   const ok = await saveToSheet('旅程', [id, name, dest, start, end]);
-  if(ok){ alert('旅程建立成功！'); go('s-home'); }
+  if(ok){ alert('旅程建立成功！'); go('s-home'); loadTrips(); }
 }
 
 async function saveFlight() {
