@@ -831,16 +831,16 @@ async function loadTrips() {
       const bg = isPast ? '#555' : '#1a1a1a';
       const badge = isPast ? '已完成' : '即將出發';
       
-      const card = \`<div class="trip-card" onclick="selectTrip('\${id}','\${name.replace(/'/g,"\\'")}')">
-        <div class="trip-header" style="background:\${bg};">
-          <div class="trip-name">\${name}</div>
-          <div class="trip-date">\${dateStr}</div>
-          <span class="trip-badge">\${badge}</span>
+      const card = `<div class="trip-card" onclick="selectTrip('${id}','${name.replace(/'/g,"\\'")}')">
+        <div class="trip-header" style="background:${bg};">
+          <div class="trip-name">${name}</div>
+          <div class="trip-date">${dateStr}</div>
+          <span class="trip-badge">${badge}</span>
         </div>
         <div class="trip-body">
-          <div class="trip-stat">📍 \${dest}</div>
+          <div class="trip-stat">📍 ${dest}</div>
         </div>
-      </div>\`;
+      </div>`;
       
       if(isPast) { pastHTML += card; pastCount++; }
       else { upcomingHTML += card; upcomingCount++; }
