@@ -250,42 +250,9 @@ textarea{resize:none;}
       <div class="person-pill" onclick="sp(this)">Samie</div>
     </div>
     <div class="section-label" style="margin-top:0;">個人資料</div>
-    <div class="card clickable" onclick="go('s-flight')">
-      <div class="card-row">
-        <div class="card-icon blue">✈️</div>
-        <div><div class="card-title">CI178 桃園 → 高松</div><div class="card-sub">5/7 14:30・T2・商務艙 12A</div></div>
-        <div class="card-chevron">›</div>
-      </div>
-    </div>
-    <div class="card clickable" onclick="go('s-passport')">
-      <div class="card-row">
-        <div class="card-icon purple">📋</div>
-        <div><div class="card-title">日本觀光簽證</div><div class="card-sub">免簽・有效至護照到期</div></div>
-        <div class="card-chevron">›</div>
-      </div>
-    </div>
-    <div class="card clickable" onclick="go('s-ticket')">
-      <div class="card-row">
-        <div class="card-icon amber">🎫</div>
-        <div><div class="card-title">KidZania 下午場</div><div class="card-sub">5/23 16:00・2大1小</div></div>
-        <div class="card-chevron">›</div>
-      </div>
-    </div>
+    <div id="detail-personal"></div>
     <div class="section-label">共用資料</div>
-    <div class="card clickable" onclick="go('s-hotel')">
-      <div class="card-row">
-        <div class="card-icon green">🏨</div>
-        <div><div class="card-title">大阪麗思卡爾頓</div><div class="card-sub">5/7 Check-in・5/10 Check-out</div></div>
-        <div class="card-chevron">›</div>
-      </div>
-    </div>
-    <div class="card clickable">
-      <div class="card-row">
-        <div class="card-icon coral">🍽️</div>
-        <div><div class="card-title">Kahala 日本料理</div><div class="card-sub">5/8 19:00・3位・確認碼 KH882</div></div>
-        <div class="card-chevron">›</div>
-      </div>
-    </div>
+    <div id="detail-shared"></div>
     <div id="detail-admin-actions" style="display:none;">
       <div class="spacer"></div>
       <button class="add-card" onclick="go('s-add-item')">＋ 新增資料</button>
@@ -727,6 +694,10 @@ function go(id) {
 function sp(el) {
   el.closest('.person-row').querySelectorAll('.person-pill').forEach(p => p.classList.remove('active'));
   el.classList.add('active');
+  // Reload detail if on detail screen
+  if(document.getElementById('s-detail').classList.contains('active')) {
+    loadTripDetail();
+  }
 }
 
 function show(id, v) {
@@ -862,6 +833,92 @@ function selectTrip(id, name) {
   currentTripName = name;
   document.querySelector('#s-detail .topbar-title').textContent = name;
   go('s-detail');
+  loadTripDetail();
+}
+
+
+async function loadTripDetail() {
+  const container = document.getElementById('detail-personal');
+  const sharedContainer = document.getElementById('detail-shared');
+  if(!container) return;
+  
+  const activePerson = document.querySelector('#s-detail .person-pill.active')?.textContent || '小米';
+  
+  container.innerHTML = '<div style="text-align:center;padding:24px;color:#999;font-size:13px;">載入中...</div>';
+  sharedContainer.innerHTML = '<div style="text-align:center;padding:24px;color:#999;font-size:13px;">載入中...</div>';
+  
+  try {
+    // Load flights
+    const flights = await loadFromSheet('機票');
+    const hotels = await loadFromSheet('住宿');
+    const tickets = await loadFromSheet('票券');
+    const passports = await loadFromSheet('簽證護照');
+    
+    // Filter by trip and person
+    const myFlights = flights.slice(1).filter(r => String(r[1]) === String(currentTripId) && r[2] === activePerson);
+    const myTickets = tickets.slice(1).filter(r => String(r[1]) === String(currentTripId) && r[2] === activePerson);
+    const myPassports = passports.slice(1).filter(r => String(r[1]) === String(currentTripId) && r[2] === activePerson);
+    const tripHotels = hotels.slice(1).filter(r => String(r[1]) === String(currentTripId));
+    
+    // Personal section
+    let personalHTML = '';
+    
+    myFlights.forEach(f => {
+      personalHTML += `<div class="card clickable" onclick="go('s-flight')">
+        <div class="card-row">
+          <div class="card-icon blue">✈️</div>
+          <div><div class="card-title">${f[3]} ${f[5]} → ${f[7]}</div><div class="card-sub">${f[6] || ''} ${f[12] ? '・'+f[12] : ''}</div></div>
+          <div class="card-chevron">›</div>
+        </div>
+      </div>`;
+    });
+    
+    myPassports.forEach(p => {
+      personalHTML += `<div class="card clickable" onclick="go('s-passport')">
+        <div class="card-row">
+          <div class="card-icon purple">📋</div>
+          <div><div class="card-title">${p[5] || '簽證'}</div><div class="card-sub">有效至 ${p[8] || ''}</div></div>
+          <div class="card-chevron">›</div>
+        </div>
+      </div>`;
+    });
+    
+    myTickets.forEach(t => {
+      personalHTML += `<div class="card clickable" onclick="go('s-ticket')">
+        <div class="card-row">
+          <div class="card-icon amber">🎫</div>
+          <div><div class="card-title">${t[3] || '票券'}</div><div class="card-sub">${t[6] || ''}</div></div>
+          <div class="card-chevron">›</div>
+        </div>
+      </div>`;
+    });
+    
+    if(personalHTML === '') {
+      personalHTML = '<div style="text-align:center;padding:20px;color:#ccc;font-size:13px;">尚未新增個人資料</div>';
+    }
+    container.innerHTML = personalHTML;
+    
+    // Shared section
+    let sharedHTML = '';
+    
+    tripHotels.forEach(h => {
+      sharedHTML += `<div class="card clickable" onclick="go('s-hotel')">
+        <div class="card-row">
+          <div class="card-icon green">🏨</div>
+          <div><div class="card-title">${h[2] || '飯店'}</div><div class="card-sub">${h[5] ? h[5]+' Check-in' : ''}</div></div>
+          <div class="card-chevron">›</div>
+        </div>
+      </div>`;
+    });
+    
+    if(sharedHTML === '') {
+      sharedHTML = '<div style="text-align:center;padding:20px;color:#ccc;font-size:13px;">尚未新增共用資料</div>';
+    }
+    sharedContainer.innerHTML = sharedHTML;
+    
+  } catch(e) {
+    container.innerHTML = '<div style="text-align:center;padding:24px;color:#999;font-size:13px;">載入失敗</div>';
+  }
 }
 
 async function saveTrip() {
