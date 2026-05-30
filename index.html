@@ -997,7 +997,7 @@ async function loadHotel() {
           <div><div class="card-title">${h[2]||''}</div><div class="card-sub">${h[5]||''} — ${h[6]||''}</div></div>
         </div>
         <div style="border-top:0.5px solid #f0f0f0;padding-top:10px;">
-          ${h[3] ? '<div class="field-row"><span class="field-label">地址</span><span class="field-value link" onclick="openMap(''+h[3]+'')">📍 '+h[3]+'</span></div>' : ''}
+          ${h[3] ? '<div class="field-row"><span class="field-label">地址</span><span class="field-value link" onclick="openMap(this.dataset.addr)" data-addr="'+h[3]+'">📍 '+h[3]+'</span></div>' : ''}
           ${h[4] ? '<div class="field-row"><span class="field-label">電話</span><span class="field-value">'+h[4]+'</span></div>' : ''}
           ${h[5] ? '<div class="field-row"><span class="field-label">Check-in</span><span class="field-value">'+h[5]+'</span></div>' : ''}
           ${h[6] ? '<div class="field-row"><span class="field-label">Check-out</span><span class="field-value">'+h[6]+'</span></div>' : ''}
@@ -1047,7 +1047,7 @@ async function loadTickets() {
           <div><div class="card-title">${t[3]||''}</div><div class="card-sub">${t[6]||''}</div></div>
         </div>
         <div style="border-top:0.5px solid #f0f0f0;padding-top:10px;">
-          ${t[4] ? '<div class="field-row"><span class="field-label">地點</span><span class="field-value link" onclick="openMap(''+t[5]+'')">📍 '+t[4]+'</span></div>' : ''}
+          ${t[4] ? '<div class="field-row"><span class="field-label">地點</span><span class="field-value link" onclick="openMap(this.dataset.addr)" data-addr="'+t[5]+'">📍 '+t[4]+'</span></div>' : ''}
           ${t[6] ? '<div class="field-row"><span class="field-label">當地時間</span><span class="field-value">'+t[6]+'</span></div>' : ''}
           ${t[7] ? '<div class="field-row"><span class="field-label">台灣時間</span><span class="field-value" style="color:#999;">'+t[7]+'</span></div>' : ''}
           ${t[8] ? '<div class="field-row"><span class="field-label">票券號碼</span><span class="field-value">'+t[8]+'</span></div>' : ''}
@@ -1133,7 +1133,7 @@ async function loadRestaurants() {
           <div><div class="card-title">${r[2]||''}</div><div class="card-sub">${r[4]||''} ${r[6]?'・'+r[6]+'位':''}</div></div>
         </div>
         <div style="border-top:0.5px solid #f0f0f0;padding-top:10px;">
-          ${r[3] ? '<div class="field-row"><span class="field-label">地址</span><span class="field-value link" onclick="openMap(''+r[3]+'')">📍 '+r[3]+'</span></div>' : ''}
+          ${r[3] ? '<div class="field-row"><span class="field-label">地址</span><span class="field-value link" onclick="openMap(this.dataset.addr)" data-addr="'+r[3]+'">📍 '+r[3]+'</span></div>' : ''}
           ${r[4] ? '<div class="field-row"><span class="field-label">訂位時間</span><span class="field-value">'+r[4]+'</span></div>' : ''}
           ${r[5] ? '<div class="field-row"><span class="field-label">台灣時間</span><span class="field-value" style="color:#999;">'+r[5]+'</span></div>' : ''}
           ${r[7] ? '<div class="field-row"><span class="field-label">確認碼</span><span class="field-value">'+r[7]+'</span></div>' : ''}
