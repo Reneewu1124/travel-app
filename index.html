@@ -217,19 +217,19 @@ textarea{resize:none;}
       <svg viewBox="0 0 24 24"><path d="M21 16v-2l-8-5V3.5a1.5 1.5 0 0 0-3 0V9l-8 5v2l8-2.5V19l-2 1.5V22l3.5-1 3.5 1v-1.5L13 19v-5.5l8 2.5z"/></svg>
       機票
     </button>
-    <button class="tab-item" onclick="go('s-hotel')">
+    <button class="tab-item" onclick="goHotel()">
       <svg viewBox="0 0 24 24"><path d="M2 20v-8a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v8"/><path d="M4 10V6a2 2 0 0 1 2-2h12a2 2 0 0 1 2 2v4"/><path d="M12 4v6"/><path d="M2 20h20"/></svg>
       住宿
     </button>
-    <button class="tab-item" onclick="go('s-ticket')">
+    <button class="tab-item" onclick="goTicket()">
       <svg viewBox="0 0 24 24"><path d="M2 9a3 3 0 0 1 0 6v2a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2v-2a3 3 0 0 1 0-6V7a2 2 0 0 0-2-2H4a2 2 0 0 0-2 2v2z"/></svg>
       票券
     </button>
-    <button class="tab-item" onclick="go('s-timeline')">
+    <button class="tab-item" onclick="goTimeline()">
       <svg viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
       行程
     </button>
-    <button class="tab-item" onclick="go('s-passport')">
+    <button class="tab-item" onclick="goPassport()">
       <svg viewBox="0 0 24 24"><rect x="2" y="5" width="20" height="14" rx="2"/><line x1="2" y1="10" x2="22" y2="10"/></svg>
       簽證
     </button>
@@ -288,10 +288,10 @@ textarea{resize:none;}
   <div class="tab-bar">
     <button class="tab-item" onclick="go('s-home')"><svg viewBox="0 0 24 24"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>總覽</button>
     <button class="tab-item active" onclick="goFlight()"><svg viewBox="0 0 24 24"><path d="M21 16v-2l-8-5V3.5a1.5 1.5 0 0 0-3 0V9l-8 5v2l8-2.5V19l-2 1.5V22l3.5-1 3.5 1v-1.5L13 19v-5.5l8 2.5z"/></svg>機票</button>
-    <button class="tab-item" onclick="go('s-hotel')"><svg viewBox="0 0 24 24"><path d="M2 20v-8a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v8"/><path d="M4 10V6a2 2 0 0 1 2-2h12a2 2 0 0 1 2 2v4"/><path d="M12 4v6"/><path d="M2 20h20"/></svg>住宿</button>
-    <button class="tab-item" onclick="go('s-ticket')"><svg viewBox="0 0 24 24"><path d="M2 9a3 3 0 0 1 0 6v2a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2v-2a3 3 0 0 1 0-6V7a2 2 0 0 0-2-2H4a2 2 0 0 0-2 2v2z"/></svg>票券</button>
-    <button class="tab-item" onclick="go('s-timeline')"><svg viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>行程</button>
-    <button class="tab-item" onclick="go('s-passport')"><svg viewBox="0 0 24 24"><rect x="2" y="5" width="20" height="14" rx="2"/><line x1="2" y1="10" x2="22" y2="10"/></svg>簽證</button>
+    <button class="tab-item" onclick="goHotel()"><svg viewBox="0 0 24 24"><path d="M2 20v-8a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v8"/><path d="M4 10V6a2 2 0 0 1 2-2h12a2 2 0 0 1 2 2v4"/><path d="M12 4v6"/><path d="M2 20h20"/></svg>住宿</button>
+    <button class="tab-item" onclick="goTicket()"><svg viewBox="0 0 24 24"><path d="M2 9a3 3 0 0 1 0 6v2a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2v-2a3 3 0 0 1 0-6V7a2 2 0 0 0-2-2H4a2 2 0 0 0-2 2v2z"/></svg>票券</button>
+    <button class="tab-item" onclick="goTimeline()"><svg viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>行程</button>
+    <button class="tab-item" onclick="goPassport()"><svg viewBox="0 0 24 24"><rect x="2" y="5" width="20" height="14" rx="2"/><line x1="2" y1="10" x2="22" y2="10"/></svg>簽證</button>
   </div>
 </div>
 
@@ -342,39 +342,7 @@ textarea{resize:none;}
     <button class="btn-edit" id="hotel-add-btn" onclick="go('s-add-hotel')" style="display:none;">＋ 新增</button>
   </div>
   <div class="content">
-    <div class="card">
-      <div class="card-row" style="margin-bottom:10px;">
-        <div class="card-icon green">🏨</div>
-        <div><div class="card-title">大阪麗思卡爾頓</div><div class="card-sub">5/7 — 5/10・3晚</div></div>
-      </div>
-      <div style="border-top:0.5px solid #f0f0f0;padding-top:10px;">
-        <div class="field-row"><span class="field-label">地址</span><span class="field-value link">📍 大阪市北区梅田3-1-3</span></div>
-        <div class="field-row"><span class="field-label">電話</span><span class="field-value">+81 6-6343-7000</span></div>
-        <div class="field-row"><span class="field-label">Check-in</span><span class="field-value">5/7 15:00</span></div>
-        <div class="field-row"><span class="field-label">Check-out</span><span class="field-value">5/10 12:00</span></div>
-        <div class="field-row"><span class="field-label">確認碼</span><span class="field-value">RC-20260507</span></div>
-        <div class="field-row"><span class="field-label">房型</span><span class="field-value">豪華客房（含早餐）</span></div>
-        <div class="field-row"><span class="field-label">金額</span><span class="field-value">JPY 180,000</span></div>
-        <div class="field-row"><span class="field-label">取消政策</span><span class="field-value">最晚 5/5 免費取消</span></div>
-      </div>
-    </div>
-    <div class="section-label">飯店設施</div>
-    <div class="card">
-      <div class="facility-row">
-        <div class="facility-left">
-          <div class="facility-icon pool">🏊</div>
-          <div><div class="facility-name">泳池</div><div class="facility-detail">3F・06:00–22:00</div></div>
-        </div>
-        <span class="has-badge has-yes">有</span>
-      </div>
-      <div class="facility-row">
-        <div class="facility-left">
-          <div class="facility-icon gym">🏋️</div>
-          <div><div class="facility-name">健身房</div><div class="facility-detail">3F・24小時</div></div>
-        </div>
-        <span class="has-badge has-yes">有</span>
-      </div>
-    </div>
+    <div id="hotel-container"></div>
     <div id="hotel-edit-actions" style="display:none;">
       <div class="btn-row">
         <button class="btn-edit" style="flex:1;justify-content:center;" onclick="go('s-add-hotel')">✏️ 編輯</button>
@@ -385,17 +353,17 @@ textarea{resize:none;}
   <div class="tab-bar">
     <button class="tab-item" onclick="go('s-home')"><svg viewBox="0 0 24 24"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>總覽</button>
     <button class="tab-item" onclick="goFlight()"><svg viewBox="0 0 24 24"><path d="M21 16v-2l-8-5V3.5a1.5 1.5 0 0 0-3 0V9l-8 5v2l8-2.5V19l-2 1.5V22l3.5-1 3.5 1v-1.5L13 19v-5.5l8 2.5z"/></svg>機票</button>
-    <button class="tab-item active" onclick="go('s-hotel')"><svg viewBox="0 0 24 24"><path d="M2 20v-8a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v8"/><path d="M4 10V6a2 2 0 0 1 2-2h12a2 2 0 0 1 2 2v4"/><path d="M12 4v6"/><path d="M2 20h20"/></svg>住宿</button>
-    <button class="tab-item" onclick="go('s-ticket')"><svg viewBox="0 0 24 24"><path d="M2 9a3 3 0 0 1 0 6v2a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2v-2a3 3 0 0 1 0-6V7a2 2 0 0 0-2-2H4a2 2 0 0 0-2 2v2z"/></svg>票券</button>
-    <button class="tab-item" onclick="go('s-timeline')"><svg viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>行程</button>
-    <button class="tab-item" onclick="go('s-passport')"><svg viewBox="0 0 24 24"><rect x="2" y="5" width="20" height="14" rx="2"/><line x1="2" y1="10" x2="22" y2="10"/></svg>簽證</button>
+    <button class="tab-item active" onclick="goHotel()"><svg viewBox="0 0 24 24"><path d="M2 20v-8a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v8"/><path d="M4 10V6a2 2 0 0 1 2-2h12a2 2 0 0 1 2 2v4"/><path d="M12 4v6"/><path d="M2 20h20"/></svg>住宿</button>
+    <button class="tab-item" onclick="goTicket()"><svg viewBox="0 0 24 24"><path d="M2 9a3 3 0 0 1 0 6v2a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2v-2a3 3 0 0 1 0-6V7a2 2 0 0 0-2-2H4a2 2 0 0 0-2 2v2z"/></svg>票券</button>
+    <button class="tab-item" onclick="goTimeline()"><svg viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>行程</button>
+    <button class="tab-item" onclick="goPassport()"><svg viewBox="0 0 24 24"><rect x="2" y="5" width="20" height="14" rx="2"/><line x1="2" y1="10" x2="22" y2="10"/></svg>簽證</button>
   </div>
 </div>
 
 <!-- 新增住宿 -->
 <div class="screen" id="s-add-hotel">
   <div class="topbar">
-    <button class="icon-btn" onclick="go('s-hotel')">✕</button>
+    <button class="icon-btn" onclick="goHotel()">✕</button>
     <div class="topbar-title">新增住宿</div>
     <div></div>
   </div>
@@ -460,19 +428,7 @@ textarea{resize:none;}
       <div class="person-pill" onclick="sp(this)">馬哥</div>
       <div class="person-pill" onclick="sp(this)">Samie</div>
     </div>
-    <div class="card">
-      <div class="card-row" style="margin-bottom:10px;">
-        <div class="card-icon amber">🎫</div>
-        <div><div class="card-title">KidZania 下午場</div><div class="card-sub">2大1小・5/23 16:00–21:00</div></div>
-      </div>
-      <div style="border-top:0.5px solid #f0f0f0;padding-top:10px;">
-        <div class="field-row"><span class="field-label">地點</span><span class="field-value link">📍 Kidzania Koshien</span></div>
-        <div class="field-row"><span class="field-label">日本時間</span><span class="field-value">16:00–21:00</span></div>
-        <div class="field-row"><span class="field-label">台灣時間</span><span class="field-value" style="color:#999;">15:00–20:00</span></div>
-        <div class="field-row"><span class="field-label">票券號碼</span><span class="field-value">KZ-88291</span></div>
-        <div class="field-row"><span class="field-label">金額</span><span class="field-value">JPY 12,800</span></div>
-      </div>
-    </div>
+    <div id="ticket-container"></div>
     <div id="ticket-edit-actions" style="display:none;">
       <div class="btn-row">
         <button class="btn-edit" style="flex:1;justify-content:center;">✏️ 編輯</button>
@@ -483,10 +439,10 @@ textarea{resize:none;}
   <div class="tab-bar">
     <button class="tab-item" onclick="go('s-home')"><svg viewBox="0 0 24 24"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>總覽</button>
     <button class="tab-item" onclick="goFlight()"><svg viewBox="0 0 24 24"><path d="M21 16v-2l-8-5V3.5a1.5 1.5 0 0 0-3 0V9l-8 5v2l8-2.5V19l-2 1.5V22l3.5-1 3.5 1v-1.5L13 19v-5.5l8 2.5z"/></svg>機票</button>
-    <button class="tab-item" onclick="go('s-hotel')"><svg viewBox="0 0 24 24"><path d="M2 20v-8a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v8"/><path d="M4 10V6a2 2 0 0 1 2-2h12a2 2 0 0 1 2 2v4"/><path d="M12 4v6"/><path d="M2 20h20"/></svg>住宿</button>
-    <button class="tab-item active" onclick="go('s-ticket')"><svg viewBox="0 0 24 24"><path d="M2 9a3 3 0 0 1 0 6v2a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2v-2a3 3 0 0 1 0-6V7a2 2 0 0 0-2-2H4a2 2 0 0 0-2 2v2z"/></svg>票券</button>
-    <button class="tab-item" onclick="go('s-timeline')"><svg viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>行程</button>
-    <button class="tab-item" onclick="go('s-passport')"><svg viewBox="0 0 24 24"><rect x="2" y="5" width="20" height="14" rx="2"/><line x1="2" y1="10" x2="22" y2="10"/></svg>簽證</button>
+    <button class="tab-item" onclick="goHotel()"><svg viewBox="0 0 24 24"><path d="M2 20v-8a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v8"/><path d="M4 10V6a2 2 0 0 1 2-2h12a2 2 0 0 1 2 2v4"/><path d="M12 4v6"/><path d="M2 20h20"/></svg>住宿</button>
+    <button class="tab-item active" onclick="goTicket()"><svg viewBox="0 0 24 24"><path d="M2 9a3 3 0 0 1 0 6v2a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2v-2a3 3 0 0 1 0-6V7a2 2 0 0 0-2-2H4a2 2 0 0 0-2 2v2z"/></svg>票券</button>
+    <button class="tab-item" onclick="goTimeline()"><svg viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>行程</button>
+    <button class="tab-item" onclick="goPassport()"><svg viewBox="0 0 24 24"><rect x="2" y="5" width="20" height="14" rx="2"/><line x1="2" y1="10" x2="22" y2="10"/></svg>簽證</button>
   </div>
 </div>
 
@@ -498,37 +454,15 @@ textarea{resize:none;}
     <div></div>
   </div>
   <div class="content">
-    <div class="section-label" style="margin-top:0;">5月7日（星期四）</div>
-    <div class="timeline-item">
-      <div class="tl-left"><div class="tl-time">14:30</div><div class="tl-dot" style="background:#1565c0;"></div><div class="tl-line"></div></div>
-      <div><div class="tl-title">CI178 出發</div><div class="tl-sub">桃園 T2 → 高松・商務艙</div></div>
-    </div>
-    <div class="timeline-item">
-      <div class="tl-left"><div class="tl-time">18:05</div><div class="tl-dot" style="background:#1565c0;"></div><div class="tl-line"></div></div>
-      <div><div class="tl-title">抵達高松機場</div><div class="tl-sub">台灣時間 17:05</div></div>
-    </div>
-    <div class="timeline-item">
-      <div class="tl-left"><div class="tl-time">15:00</div><div class="tl-dot" style="background:#2e7d32;"></div><div class="tl-line"></div></div>
-      <div><div class="tl-title">大阪麗思卡爾頓 Check-in</div><div class="tl-sub">豪華客房・RC-20260507</div></div>
-    </div>
-    <div class="section-label">5月8日（星期五）</div>
-    <div class="timeline-item">
-      <div class="tl-left"><div class="tl-time">19:00</div><div class="tl-dot" style="background:#bf360c;"></div><div class="tl-line"></div></div>
-      <div><div class="tl-title">Kahala 日本料理晚餐</div><div class="tl-sub">3位・確認碼 KH882</div></div>
-    </div>
-    <div class="section-label">5月23日（星期六）</div>
-    <div class="timeline-item">
-      <div class="tl-left"><div class="tl-time">16:00</div><div class="tl-dot" style="background:#e65100;"></div><div class="tl-line"></div></div>
-      <div><div class="tl-title">KidZania 下午場</div><div class="tl-sub">Koshien・台灣時間 15:00</div></div>
-    </div>
+    <div id="timeline-container"></div>
   </div>
   <div class="tab-bar">
     <button class="tab-item" onclick="go('s-home')"><svg viewBox="0 0 24 24"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>總覽</button>
     <button class="tab-item" onclick="goFlight()"><svg viewBox="0 0 24 24"><path d="M21 16v-2l-8-5V3.5a1.5 1.5 0 0 0-3 0V9l-8 5v2l8-2.5V19l-2 1.5V22l3.5-1 3.5 1v-1.5L13 19v-5.5l8 2.5z"/></svg>機票</button>
-    <button class="tab-item" onclick="go('s-hotel')"><svg viewBox="0 0 24 24"><path d="M2 20v-8a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v8"/><path d="M4 10V6a2 2 0 0 1 2-2h12a2 2 0 0 1 2 2v4"/><path d="M12 4v6"/><path d="M2 20h20"/></svg>住宿</button>
-    <button class="tab-item" onclick="go('s-ticket')"><svg viewBox="0 0 24 24"><path d="M2 9a3 3 0 0 1 0 6v2a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2v-2a3 3 0 0 1 0-6V7a2 2 0 0 0-2-2H4a2 2 0 0 0-2 2v2z"/></svg>票券</button>
-    <button class="tab-item active" onclick="go('s-timeline')"><svg viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>行程</button>
-    <button class="tab-item" onclick="go('s-passport')"><svg viewBox="0 0 24 24"><rect x="2" y="5" width="20" height="14" rx="2"/><line x1="2" y1="10" x2="22" y2="10"/></svg>簽證</button>
+    <button class="tab-item" onclick="goHotel()"><svg viewBox="0 0 24 24"><path d="M2 20v-8a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v8"/><path d="M4 10V6a2 2 0 0 1 2-2h12a2 2 0 0 1 2 2v4"/><path d="M12 4v6"/><path d="M2 20h20"/></svg>住宿</button>
+    <button class="tab-item" onclick="goTicket()"><svg viewBox="0 0 24 24"><path d="M2 9a3 3 0 0 1 0 6v2a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2v-2a3 3 0 0 1 0-6V7a2 2 0 0 0-2-2H4a2 2 0 0 0-2 2v2z"/></svg>票券</button>
+    <button class="tab-item active" onclick="goTimeline()"><svg viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>行程</button>
+    <button class="tab-item" onclick="goPassport()"><svg viewBox="0 0 24 24"><rect x="2" y="5" width="20" height="14" rx="2"/><line x1="2" y1="10" x2="22" y2="10"/></svg>簽證</button>
   </div>
 </div>
 
@@ -545,29 +479,7 @@ textarea{resize:none;}
       <div class="person-pill" onclick="sp(this)">馬哥</div>
       <div class="person-pill" onclick="sp(this)">Samie</div>
     </div>
-    <div class="section-label" style="margin-top:0;">護照</div>
-    <div class="passport-card">
-      <div style="display:flex;justify-content:space-between;align-items:flex-start;">
-        <div><div class="passport-name">許書綺</div><div class="passport-sub">REPUBLIC OF CHINA</div></div>
-        <span style="font-size:28px;opacity:0.5;">🛂</span>
-      </div>
-      <div class="passport-fields">
-        <div class="passport-field"><label>護照號碼</label><p>A123456789</p></div>
-        <div class="passport-field"><label>有效期限</label><p>2029/08/15</p></div>
-      </div>
-    </div>
-    <div class="section-label">簽證</div>
-    <div class="passport-card" style="background:#2d2d5e;">
-      <div style="display:flex;justify-content:space-between;align-items:flex-start;">
-        <div><div class="passport-name">日本觀光簽證</div><div class="passport-sub">免簽・90天</div></div>
-        <span style="font-size:22px;color:#81c784;">✓</span>
-      </div>
-      <div class="passport-fields">
-        <div class="passport-field"><label>入境次數</label><p>多次</p></div>
-        <div class="passport-field"><label>有效期限</label><p>與護照同</p></div>
-      </div>
-    </div>
-    <div class="warn-box">⚠️ 護照將於 3 年後到期，請注意更新</div>
+    <div id="passport-container"></div>
     <div style="height:12px;"></div>
     <button class="btn-secondary" style="width:100%;display:flex;align-items:center;justify-content:center;gap:8px;margin-bottom:8px;">📱 顯示 QR 碼</button>
     <div id="passport-edit-actions" style="display:none;">
@@ -582,10 +494,10 @@ textarea{resize:none;}
   <div class="tab-bar">
     <button class="tab-item" onclick="go('s-home')"><svg viewBox="0 0 24 24"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>總覽</button>
     <button class="tab-item" onclick="goFlight()"><svg viewBox="0 0 24 24"><path d="M21 16v-2l-8-5V3.5a1.5 1.5 0 0 0-3 0V9l-8 5v2l8-2.5V19l-2 1.5V22l3.5-1 3.5 1v-1.5L13 19v-5.5l8 2.5z"/></svg>機票</button>
-    <button class="tab-item" onclick="go('s-hotel')"><svg viewBox="0 0 24 24"><path d="M2 20v-8a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v8"/><path d="M4 10V6a2 2 0 0 1 2-2h12a2 2 0 0 1 2 2v4"/><path d="M12 4v6"/><path d="M2 20h20"/></svg>住宿</button>
-    <button class="tab-item" onclick="go('s-ticket')"><svg viewBox="0 0 24 24"><path d="M2 9a3 3 0 0 1 0 6v2a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2v-2a3 3 0 0 1 0-6V7a2 2 0 0 0-2-2H4a2 2 0 0 0-2 2v2z"/></svg>票券</button>
-    <button class="tab-item" onclick="go('s-timeline')"><svg viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>行程</button>
-    <button class="tab-item active" onclick="go('s-passport')"><svg viewBox="0 0 24 24"><rect x="2" y="5" width="20" height="14" rx="2"/><line x1="2" y1="10" x2="22" y2="10"/></svg>簽證</button>
+    <button class="tab-item" onclick="goHotel()"><svg viewBox="0 0 24 24"><path d="M2 20v-8a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v8"/><path d="M4 10V6a2 2 0 0 1 2-2h12a2 2 0 0 1 2 2v4"/><path d="M12 4v6"/><path d="M2 20h20"/></svg>住宿</button>
+    <button class="tab-item" onclick="goTicket()"><svg viewBox="0 0 24 24"><path d="M2 9a3 3 0 0 1 0 6v2a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2v-2a3 3 0 0 1 0-6V7a2 2 0 0 0-2-2H4a2 2 0 0 0-2 2v2z"/></svg>票券</button>
+    <button class="tab-item" onclick="goTimeline()"><svg viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>行程</button>
+    <button class="tab-item active" onclick="goPassport()"><svg viewBox="0 0 24 24"><rect x="2" y="5" width="20" height="14" rx="2"/><line x1="2" y1="10" x2="22" y2="10"/></svg>簽證</button>
   </div>
 </div>
 
@@ -630,7 +542,7 @@ textarea{resize:none;}
     <div class="section-label" style="margin-top:0;">選擇類型</div>
     <div class="card clickable" onclick="go('s-add-flight')"><div class="card-row"><div class="card-icon blue">✈️</div><div><div class="card-title">機票</div><div class="card-sub">新增航班資訊</div></div><div class="card-chevron">›</div></div></div>
     <div class="card clickable" onclick="go('s-add-hotel')"><div class="card-row"><div class="card-icon green">🏨</div><div><div class="card-title">住宿</div><div class="card-sub">新增飯店訂房</div></div><div class="card-chevron">›</div></div></div>
-    <div class="card clickable"><div class="card-row"><div class="card-icon coral">🍽️</div><div><div class="card-title">餐廳</div><div class="card-sub">新增餐廳訂位</div></div><div class="card-chevron">›</div></div></div>
+    <div class="card clickable" onclick="go('s-add-restaurant')"><div class="card-row"><div class="card-icon coral">🍽️</div><div><div class="card-title">餐廳</div><div class="card-sub">新增餐廳訂位</div></div><div class="card-chevron">›</div></div></div>
     <div class="card clickable"><div class="card-row"><div class="card-icon amber">🎫</div><div><div class="card-title">票券</div><div class="card-sub">新增景點票券</div></div><div class="card-chevron">›</div></div></div>
     <div class="card clickable"><div class="card-row"><div class="card-icon purple">📋</div><div><div class="card-title">簽證／護照</div><div class="card-sub">新增簽證資料</div></div><div class="card-chevron">›</div></div></div>
   </div>
@@ -960,7 +872,7 @@ async function loadTripDetail() {
     });
     
     myPassports.forEach(p => {
-      personalHTML += `<div class="card clickable" onclick="go('s-passport')">
+      personalHTML += `<div class="card clickable" onclick="goPassport()">
         <div class="card-row">
           <div class="card-icon purple">📋</div>
           <div><div class="card-title">${p[5] || '簽證'}</div><div class="card-sub">有效至 ${p[8] || ''}</div></div>
@@ -970,7 +882,7 @@ async function loadTripDetail() {
     });
     
     myTickets.forEach(t => {
-      personalHTML += `<div class="card clickable" onclick="go('s-ticket')">
+      personalHTML += `<div class="card clickable" onclick="goTicket()">
         <div class="card-row">
           <div class="card-icon amber">🎫</div>
           <div><div class="card-title">${t[3] || '票券'}</div><div class="card-sub">${t[6] || ''}</div></div>
@@ -988,7 +900,7 @@ async function loadTripDetail() {
     let sharedHTML = '';
     
     tripHotels.forEach(h => {
-      sharedHTML += `<div class="card clickable" onclick="go('s-hotel')">
+      sharedHTML += `<div class="card clickable" onclick="goHotel()">
         <div class="card-row">
           <div class="card-icon green">🏨</div>
           <div><div class="card-title">${h[2] || '飯店'}</div><div class="card-sub">${h[5] ? h[5]+' Check-in' : ''}</div></div>
@@ -1057,8 +969,336 @@ async function saveHotel() {
   if(!hotelName){ alert('請填寫飯店名稱'); return; }
   const id = Date.now();
   const ok = await saveToSheet('住宿', [id, 1, hotelName, address, phone, checkin, checkout, confirmCode, roomType, price, cancel, poolOn?'有':'無', '', '', gymOn?'有':'無', '', '']);
-  if(ok){ clearCache(); alert('住宿新增成功！'); go('s-hotel'); }
+  if(ok){ clearCache(); alert('住宿新增成功！'); goHotel(); }
+}
+
+async function loadHotel() {
+  const container = document.getElementById('hotel-container');
+  if(!container) return;
+  container.innerHTML = '<div style="text-align:center;padding:24px;color:#999;font-size:13px;">載入中...</div>';
+  try {
+    const rows = await loadFromSheet('住宿');
+    const hotels = rows.slice(1).filter(r => String(r[1]) === String(currentTripId));
+    if(hotels.length === 0) {
+      container.innerHTML = '<div style="text-align:center;padding:40px 20px;color:#ccc;"><div style="font-size:40px;margin-bottom:10px;">🏨</div><p style="font-size:13px;">尚未新增住宿</p></div>';
+      return;
+    }
+    let html = '';
+    hotels.forEach(h => {
+      const pool = h[11] || '';
+      const poolFloor = h[12] || '';
+      const poolTime = h[13] || '';
+      const gym = h[14] || '';
+      const gymFloor = h[15] || '';
+      const gymTime = h[16] || '';
+      html += `<div class="card" style="cursor:default;">
+        <div class="card-row" style="margin-bottom:10px;">
+          <div class="card-icon green">🏨</div>
+          <div><div class="card-title">${h[2]||''}</div><div class="card-sub">${h[5]||''} — ${h[6]||''}</div></div>
+        </div>
+        <div style="border-top:0.5px solid #f0f0f0;padding-top:10px;">
+          ${h[3] ? '<div class="field-row"><span class="field-label">地址</span><span class="field-value link" onclick="openMap(''+h[3]+'')">📍 '+h[3]+'</span></div>' : ''}
+          ${h[4] ? '<div class="field-row"><span class="field-label">電話</span><span class="field-value">'+h[4]+'</span></div>' : ''}
+          ${h[5] ? '<div class="field-row"><span class="field-label">Check-in</span><span class="field-value">'+h[5]+'</span></div>' : ''}
+          ${h[6] ? '<div class="field-row"><span class="field-label">Check-out</span><span class="field-value">'+h[6]+'</span></div>' : ''}
+          ${h[7] ? '<div class="field-row"><span class="field-label">確認碼</span><span class="field-value">'+h[7]+'</span></div>' : ''}
+          ${h[8] ? '<div class="field-row"><span class="field-label">房型</span><span class="field-value">'+h[8]+'</span></div>' : ''}
+          ${h[9] ? '<div class="field-row"><span class="field-label">金額</span><span class="field-value">'+h[9]+'</span></div>' : ''}
+          ${h[10] ? '<div class="field-row"><span class="field-label">取消政策</span><span class="field-value">'+h[10]+'</span></div>' : ''}
+        </div>
+      </div>
+      ${(pool || gym) ? `<div class="section-label">飯店設施</div>
+      <div class="card">
+        ${pool ? '<div class="facility-row"><div class="facility-left"><div class="facility-icon pool">🏊</div><div><div class="facility-name">泳池</div>'+(poolFloor||poolTime ? '<div class="facility-detail">'+(poolFloor||'')+(poolFloor&&poolTime?'・':'')+(poolTime||'')+'</div>' : '')+'</div></div><span class="has-badge '+(pool==='有'?'has-yes':'has-no')+'">'+pool+'</span></div>' : ''}
+        ${gym ? '<div class="facility-row"><div class="facility-left"><div class="facility-icon gym">🏋️</div><div><div class="facility-name">健身房</div>'+(gymFloor||gymTime ? '<div class="facility-detail">'+(gymFloor||'')+(gymFloor&&gymTime?'・':'')+(gymTime||'')+'</div>' : '')+'</div></div><span class="has-badge '+(gym==='有'?'has-yes':'has-no')+'">'+gym+'</span></div>' : ''}
+      </div>` : ''}`;
+    });
+    container.innerHTML = html;
+    const editActions = document.getElementById('hotel-edit-actions');
+    if(editActions) editActions.style.display = isAdmin ? '' : 'none';
+  } catch(e) {
+    container.innerHTML = '<div style="text-align:center;padding:24px;color:#999;font-size:13px;">載入失敗</div>';
+  }
+}
+
+function goHotel() {
+  go('s-hotel');
+  loadHotel();
+}
+
+async function loadTickets() {
+  const container = document.getElementById('ticket-container');
+  if(!container) return;
+  const activePerson = document.querySelector('#s-ticket .person-pill.active')?.textContent || '全部';
+  container.innerHTML = '<div style="text-align:center;padding:24px;color:#999;font-size:13px;">載入中...</div>';
+  try {
+    const rows = await loadFromSheet('票券');
+    let tickets = rows.slice(1).filter(r => String(r[1]) === String(currentTripId));
+    if(activePerson !== '全部') tickets = tickets.filter(r => r[2] === activePerson);
+    if(tickets.length === 0) {
+      container.innerHTML = '<div style="text-align:center;padding:40px 20px;color:#ccc;"><div style="font-size:40px;margin-bottom:10px;">🎫</div><p style="font-size:13px;">尚未新增票券</p></div>';
+      return;
+    }
+    let html = '';
+    tickets.forEach(t => {
+      html += `<div class="card" style="cursor:default;">
+        <div class="card-row" style="margin-bottom:10px;">
+          <div class="card-icon amber">🎫</div>
+          <div><div class="card-title">${t[3]||''}</div><div class="card-sub">${t[6]||''}</div></div>
+        </div>
+        <div style="border-top:0.5px solid #f0f0f0;padding-top:10px;">
+          ${t[4] ? '<div class="field-row"><span class="field-label">地點</span><span class="field-value link" onclick="openMap(''+t[5]+'')">📍 '+t[4]+'</span></div>' : ''}
+          ${t[6] ? '<div class="field-row"><span class="field-label">當地時間</span><span class="field-value">'+t[6]+'</span></div>' : ''}
+          ${t[7] ? '<div class="field-row"><span class="field-label">台灣時間</span><span class="field-value" style="color:#999;">'+t[7]+'</span></div>' : ''}
+          ${t[8] ? '<div class="field-row"><span class="field-label">票券號碼</span><span class="field-value">'+t[8]+'</span></div>' : ''}
+          ${t[9] ? '<div class="field-row"><span class="field-label">金額</span><span class="field-value">'+t[9]+'</span></div>' : ''}
+          ${t[2] ? '<div style="margin-top:8px;"><span style="font-size:11px;padding:3px 8px;border-radius:20px;background:#fff8e1;color:#e65100;">'+t[2]+'</span></div>' : ''}
+        </div>
+      </div>`;
+    });
+    container.innerHTML = html;
+  } catch(e) {
+    container.innerHTML = '<div style="text-align:center;padding:24px;color:#999;font-size:13px;">載入失敗</div>';
+  }
+}
+
+function goTicket() {
+  go('s-ticket');
+  loadTickets();
+}
+
+async function loadPassports() {
+  const container = document.getElementById('passport-container');
+  if(!container) return;
+  const activePerson = document.querySelector('#s-passport .person-pill.active')?.textContent || '小米';
+  container.innerHTML = '<div style="text-align:center;padding:24px;color:#999;font-size:13px;">載入中...</div>';
+  try {
+    const rows = await loadFromSheet('簽證護照');
+    const items = rows.slice(1).filter(r => String(r[1]) === String(currentTripId) && r[2] === activePerson);
+    if(items.length === 0) {
+      container.innerHTML = '<div style="text-align:center;padding:40px 20px;color:#ccc;"><div style="font-size:40px;margin-bottom:10px;">📋</div><p style="font-size:13px;">尚未新增簽證護照</p></div>';
+      return;
+    }
+    let html = '';
+    items.forEach(p => {
+      const type = p[3] || '';
+      const isPassport = type === '護照';
+      const bg = isPassport ? '#1a1a1a' : '#2d2d5e';
+      const today = new Date();
+      const expiry = p[8] ? new Date(p[8]) : null;
+      const daysLeft = expiry ? Math.floor((expiry - today) / (1000*60*60*24)) : null;
+      const warn = daysLeft !== null && daysLeft < 365;
+      html += `<div style="background:${bg};border-radius:12px;padding:16px;margin-bottom:10px;color:white;">
+        <div style="display:flex;justify-content:space-between;align-items:flex-start;">
+          <div>
+            <div style="font-size:16px;font-weight:600;">${p[2]||''}</div>
+            <div style="font-size:12px;opacity:0.6;margin-top:2px;">${p[4]||''} ${p[5]||''}</div>
+          </div>
+          <span style="font-size:22px;opacity:0.5;">${isPassport ? '🛂' : '📋'}</span>
+        </div>
+        <div style="display:flex;justify-content:space-between;margin-top:12px;">
+          ${p[6] ? '<div><div style="font-size:10px;opacity:0.6;">護照號碼</div><div style="font-size:13px;font-weight:500;margin-top:2px;">'+p[6]+'</div></div>' : ''}
+          ${p[8] ? '<div><div style="font-size:10px;opacity:0.6;">有效期限</div><div style="font-size:13px;font-weight:500;margin-top:2px;">'+p[8]+'</div></div>' : ''}
+        </div>
+      </div>
+      ${warn ? '<div class="warn-box">⚠️ 即將到期，請注意更新（剩 '+daysLeft+' 天）</div>' : ''}`;
+    });
+    container.innerHTML = html;
+  } catch(e) {
+    container.innerHTML = '<div style="text-align:center;padding:24px;color:#999;font-size:13px;">載入失敗</div>';
+  }
+}
+
+function goPassport() {
+  go('s-passport');
+  loadPassports();
+}
+
+async function loadRestaurants() {
+  const container = document.getElementById('restaurant-container');
+  if(!container) return;
+  container.innerHTML = '<div style="text-align:center;padding:24px;color:#999;font-size:13px;">載入中...</div>';
+  try {
+    const rows = await loadFromSheet('餐廳');
+    const restaurants = rows.slice(1).filter(r => String(r[1]) === String(currentTripId));
+    if(restaurants.length === 0) {
+      container.innerHTML = '<div style="text-align:center;padding:40px 20px;color:#ccc;"><div style="font-size:40px;margin-bottom:10px;">🍽️</div><p style="font-size:13px;">尚未新增餐廳</p></div>';
+      return;
+    }
+    let html = '';
+    restaurants.forEach(r => {
+      html += `<div class="card" style="cursor:default;">
+        <div class="card-row" style="margin-bottom:10px;">
+          <div class="card-icon coral">🍽️</div>
+          <div><div class="card-title">${r[2]||''}</div><div class="card-sub">${r[4]||''} ${r[6]?'・'+r[6]+'位':''}</div></div>
+        </div>
+        <div style="border-top:0.5px solid #f0f0f0;padding-top:10px;">
+          ${r[3] ? '<div class="field-row"><span class="field-label">地址</span><span class="field-value link" onclick="openMap(''+r[3]+'')">📍 '+r[3]+'</span></div>' : ''}
+          ${r[4] ? '<div class="field-row"><span class="field-label">訂位時間</span><span class="field-value">'+r[4]+'</span></div>' : ''}
+          ${r[5] ? '<div class="field-row"><span class="field-label">台灣時間</span><span class="field-value" style="color:#999;">'+r[5]+'</span></div>' : ''}
+          ${r[7] ? '<div class="field-row"><span class="field-label">確認碼</span><span class="field-value">'+r[7]+'</span></div>' : ''}
+          ${r[8] ? '<div class="field-row"><span class="field-label">取消政策</span><span class="field-value">'+r[8]+'</span></div>' : ''}
+          ${r[9] ? '<div class="field-row"><span class="field-label">訂金</span><span class="field-value">'+r[9]+'</span></div>' : ''}
+          ${r[10] ? '<div class="field-row"><span class="field-label">訂金金額</span><span class="field-value">'+r[10]+'</span></div>' : ''}
+          ${r[11] ? '<div class="field-row"><span class="field-label">備注</span><span class="field-value">'+r[11]+'</span></div>' : ''}
+        </div>
+      </div>`;
+    });
+    container.innerHTML = html;
+  } catch(e) {
+    container.innerHTML = '<div style="text-align:center;padding:24px;color:#999;font-size:13px;">載入失敗</div>';
+  }
+}
+
+
+async function savePassport() {
+  const inputs = document.querySelectorAll('#s-add-passport input');
+  if(!inputs.length) return;
+  const type = document.querySelector('#s-add-passport .person-pill.active')?.textContent || '';
+  const person = document.querySelector('#s-passport .person-pill.active')?.textContent || '小米';
+  const country = inputs[0]?.value || '';
+  const visaType = inputs[1]?.value || '';
+  const passportNo = inputs[2]?.value || '';
+  const issueDate = inputs[3]?.value || '';
+  const expiry = inputs[4]?.value || '';
+  const entries = inputs[5]?.value || '';
+  const note = inputs[6]?.value || '';
+  if(!person){ alert('請選擇旅客'); return; }
+  const id = Date.now();
+  const ok = await saveToSheet('簽證護照', [id, currentTripId, person, type, country, visaType, passportNo, issueDate, expiry, entries, note, '']);
+  if(ok){ clearCache(); alert('新增成功！'); goPassport(); }
+}
+
+async function saveRestaurant() {
+  const inputs = document.querySelectorAll('#s-add-restaurant input');
+  const name = inputs[0]?.value || '';
+  const address = inputs[1]?.value || '';
+  const time = inputs[2]?.value || '';
+  const twTime = inputs[3]?.value || '';
+  const people = inputs[4]?.value || '';
+  const code = inputs[5]?.value || '';
+  const cancel = inputs[6]?.value || '';
+  const deposit = inputs[7]?.value || '';
+  const depositAmt = inputs[8]?.value || '';
+  const note = document.querySelector('#s-add-restaurant textarea')?.value || '';
+  if(!name){ alert('請填寫餐廳名稱'); return; }
+  const id = Date.now();
+  const ok = await saveToSheet('餐廳', [id, currentTripId, name, address, time, twTime, people, code, cancel, deposit, depositAmt, note]);
+  if(ok){ clearCache(); alert('餐廳新增成功！'); go('s-detail'); loadTripDetail(); }
+}
+
+async function loadTimeline() {
+  const container = document.getElementById('timeline-container');
+  if(!container) return;
+  container.innerHTML = '<div style="text-align:center;padding:24px;color:#999;font-size:13px;">載入中...</div>';
+  try {
+    const [flights, hotels, tickets, restaurants] = await Promise.all([
+      loadFromSheet('機票'),
+      loadFromSheet('住宿'),
+      loadFromSheet('票券'),
+      loadFromSheet('餐廳')
+    ]);
+    
+    let events = [];
+    
+    flights.slice(1).filter(r => String(r[1]) === String(currentTripId)).forEach(f => {
+      if(f[6]) events.push({ time: f[6], title: (f[3]||'') + ' 出發', sub: (f[5]||'') + ' → ' + (f[7]||''), color: '#1565c0', icon: '✈️' });
+      if(f[8]) events.push({ time: f[8], title: '抵達 ' + (f[7]||''), sub: f[9] ? '台灣時間 ' + f[9] : '', color: '#1565c0', icon: '✈️' });
+    });
+    
+    hotels.slice(1).filter(r => String(r[1]) === String(currentTripId)).forEach(h => {
+      if(h[5]) events.push({ time: h[5], title: (h[2]||'') + ' Check-in', sub: h[7] ? '確認碼 ' + h[7] : '', color: '#2e7d32', icon: '🏨' });
+      if(h[6]) events.push({ time: h[6], title: (h[2]||'') + ' Check-out', sub: '', color: '#2e7d32', icon: '🏨' });
+    });
+    
+    tickets.slice(1).filter(r => String(r[1]) === String(currentTripId)).forEach(t => {
+      if(t[6]) events.push({ time: t[6], title: t[3]||'票券', sub: t[4]||'', color: '#e65100', icon: '🎫' });
+    });
+    
+    restaurants.slice(1).filter(r => String(r[1]) === String(currentTripId)).forEach(r => {
+      if(r[4]) events.push({ time: r[4], title: r[2]||'餐廳', sub: r[6] ? r[6] + '位' : '', color: '#bf360c', icon: '🍽️' });
+    });
+    
+    if(events.length === 0) {
+      container.innerHTML = '<div style="text-align:center;padding:40px 20px;color:#ccc;"><div style="font-size:40px;margin-bottom:10px;">🗓️</div><p style="font-size:13px;">尚未新增任何行程</p></div>';
+      return;
+    }
+    
+    events.sort((a, b) => new Date(a.time) - new Date(b.time));
+    
+    let currentDate = '';
+    let html = '';
+    
+    events.forEach((e, i) => {
+      const d = new Date(e.time);
+      const dateStr = isNaN(d) ? '' : d.getFullYear() + '年' + (d.getMonth()+1) + '月' + d.getDate() + '日';
+      const timeStr = isNaN(d) ? e.time : d.getHours().toString().padStart(2,'0') + ':' + d.getMinutes().toString().padStart(2,'0');
+      
+      if(dateStr && dateStr !== currentDate) {
+        currentDate = dateStr;
+        html += '<div class="section-label">' + dateStr + '</div>';
+      }
+      
+      html += `<div class="timeline-item">
+        <div class="tl-left">
+          <div class="tl-time">${timeStr}</div>
+          <div class="tl-dot" style="background:${e.color};"></div>
+          ${i < events.length-1 ? '<div class="tl-line"></div>' : ''}
+        </div>
+        <div>
+          <div class="tl-title">${e.icon} ${e.title}</div>
+          ${e.sub ? '<div class="tl-sub">'+e.sub+'</div>' : ''}
+        </div>
+      </div>`;
+    });
+    
+    container.innerHTML = html;
+  } catch(e) {
+    container.innerHTML = '<div style="text-align:center;padding:24px;color:#999;font-size:13px;">載入失敗</div>';
+  }
+}
+
+function goTimeline() {
+  go('s-timeline');
+  loadTimeline();
+}
+
+function openMap(address) {
+  if(!address) return;
+  const url = 'https://maps.google.com/?q=' + encodeURIComponent(address);
+  window.open(url, '_blank');
 }
 </script>
+
+<!-- 新增餐廳 -->
+<div class="screen" id="s-add-restaurant">
+  <div class="topbar">
+    <button class="icon-btn" onclick="go('s-add-item')">✕</button>
+    <div class="topbar-title">新增餐廳</div>
+    <div></div>
+  </div>
+  <div class="content">
+    <div class="ocr-zone" onclick="alert('OCR功能即將推出')">
+      📷<br>上傳訂位確認截圖<br><small style="font-size:11px;">AI 自動辨識帶入欄位</small>
+    </div>
+    <div class="divider">或手動輸入</div>
+    <label class="form-label" style="margin-top:8px;">餐廳名稱</label><input type="text" placeholder="如：Kahala 日本料理">
+    <label class="form-label">地址（連結 Google Map）</label><input type="text" placeholder="輸入地址">
+    <label class="form-label">訂位時間（當地）</label><input type="text" placeholder="如：5/8 19:00">
+    <label class="form-label">台灣時間備注</label><input type="text" placeholder="如：台灣時間 18:00">
+    <label class="form-label">人數</label><input type="number" placeholder="如：3">
+    <label class="form-label">確認碼</label><input type="text" placeholder="訂位確認碼">
+    <label class="form-label">取消政策</label><input type="text" placeholder="如：最晚24小時前免費取消">
+    <label class="form-label">訂金</label><input type="text" placeholder="如：有／無">
+    <label class="form-label">訂金金額</label><input type="text" placeholder="如：TWD 1,000">
+    <label class="form-label">備注</label>
+    <textarea placeholder="其他備注..." style="height:64px;"></textarea>
+    <div class="btn-row" style="margin-top:12px;">
+      <button class="btn-secondary" onclick="go('s-add-item')" style="flex:1;">取消</button>
+      <button class="btn-primary" onclick="saveRestaurant()" style="flex:1;">儲存</button>
+    </div>
+    <div class="spacer"></div>
+  </div>
+</div>
 </body>
 </html>
