@@ -197,6 +197,7 @@ textarea{resize:none;}
     <div class="topbar-title">🌏 旅遊管家</div>
     <div class="topbar-right">
       <span class="mode-badge" id="home-badge"></span>
+      <button class="icon-btn" id="settings-btn" onclick="go('s-change-pwd')" style="display:none;" title="設定">⚙️</button>
       <button class="icon-btn" onclick="doLogout()" title="登出">⎋</button>
     </div>
   </div>
@@ -238,7 +239,7 @@ textarea{resize:none;}
     <div id="detail-admin-actions" style="display:none;">
       <div class="spacer"></div>
       <button class="add-card" onclick="go('s-add-item')">＋ 新增資料</button>
-      <button class="btn-primary" style="display:flex;align-items:center;justify-content:center;gap:8px;">
+      <button class="btn-primary" onclick="sendToCalendar()" style="display:flex;align-items:center;justify-content:center;gap:8px;">
         📅 發送至 Google 行事曆
       </button>
     </div>
@@ -525,8 +526,8 @@ textarea{resize:none;}
     <div class="card clickable" onclick="go('s-add-flight')"><div class="card-row"><div class="card-icon blue">✈️</div><div><div class="card-title">機票</div><div class="card-sub">新增航班資訊</div></div><div class="card-chevron">›</div></div></div>
     <div class="card clickable" onclick="go('s-add-hotel')"><div class="card-row"><div class="card-icon green">🏨</div><div><div class="card-title">住宿</div><div class="card-sub">新增飯店訂房</div></div><div class="card-chevron">›</div></div></div>
     <div class="card clickable" onclick="go('s-add-restaurant')"><div class="card-row"><div class="card-icon coral">🍽️</div><div><div class="card-title">餐廳</div><div class="card-sub">新增餐廳訂位</div></div><div class="card-chevron">›</div></div></div>
-    <div class="card clickable"><div class="card-row"><div class="card-icon amber">🎫</div><div><div class="card-title">票券</div><div class="card-sub">新增景點票券</div></div><div class="card-chevron">›</div></div></div>
-    <div class="card clickable"><div class="card-row"><div class="card-icon purple">📋</div><div><div class="card-title">簽證／護照</div><div class="card-sub">新增簽證資料</div></div><div class="card-chevron">›</div></div></div>
+    <div class="card clickable" onclick="go('s-add-ticket')"><div class="card-row"><div class="card-icon amber">🎫</div><div><div class="card-title">票券</div><div class="card-sub">新增景點票券</div></div><div class="card-chevron">›</div></div></div>
+    <div class="card clickable" onclick="go('s-add-passport')"><div class="card-row"><div class="card-icon purple">📋</div><div><div class="card-title">簽證／護照</div><div class="card-sub">新增簽證資料</div></div><div class="card-chevron">›</div></div></div>
   </div>
 </div>
 
@@ -631,9 +632,9 @@ function doLogin() {
   const pwd = document.getElementById('pwd-input').value;
   const err = document.getElementById('pwd-error');
   if (pwd === ADMIN_PWD) {
-    isAdmin = true; applyMode(); go('s-home'); err.textContent = ''; loadTrips();
+    isAdmin = true; applyMode(); go('s-home'); err.textContent = ''; loadTrips(); checkPassportExpiry();
   } else if (pwd === VIEW_PWD) {
-    isAdmin = false; applyMode(); go('s-home'); err.textContent = ''; loadTrips();
+    isAdmin = false; applyMode(); go('s-home'); err.textContent = ''; loadTrips(); checkPassportExpiry();
   } else {
     err.textContent = '密碼錯誤，請再試一次';
   }
@@ -934,7 +935,7 @@ async function saveFlight() {
   const pnr = inputs[11]?.value || '';
   if(!flight){ alert('請填寫航班號'); return; }
   const id = Date.now();
-  const ok = await saveToSheet('機票', [id, 1, person, flight, ticketNo, depAirport, depTime, arrAirport, arrTime, twTime, duration, terminal, seat, cabin, price, pnr]);
+  const ok = await saveToSheet('機票', [id, currentTripId, person, flight, ticketNo, depAirport, depTime, arrAirport, arrTime, twTime, duration, terminal, seat, cabin, price, pnr]);
   if(ok){ clearCache(); alert('機票新增成功！'); go('s-flight'); loadFlights(); }
 }
 
@@ -953,7 +954,7 @@ async function saveHotel() {
   const gymOn = document.getElementById('gym-toggle')?.classList.contains('on');
   if(!hotelName){ alert('請填寫飯店名稱'); return; }
   const id = Date.now();
-  const ok = await saveToSheet('住宿', [id, 1, hotelName, address, phone, checkin, checkout, confirmCode, roomType, price, cancel, poolOn?'有':'無', '', '', gymOn?'有':'無', '', '']);
+  const ok = await saveToSheet('住宿', [id, currentTripId, hotelName, address, phone, checkin, checkout, confirmCode, roomType, price, cancel, poolOn?'有':'無', '', '', gymOn?'有':'無', '', '']);
   if(ok){ clearCache(); alert('住宿新增成功！'); goHotel(); }
 }
 
@@ -1352,7 +1353,7 @@ var ocrTargetScreen = 's-add-flight';
 var ocrData = {};
 
 function triggerOCR(type) {
-  ocrTargetScreen = type === 'flight' ? 's-add-flight' : type === 'hotel' ? 's-add-hotel' : type === 'ticket' ? 's-add-ticket' : 's-add-flight';
+  ocrTargetScreen = type === 'flight' ? 's-add-flight' : type === 'hotel' ? 's-add-hotel' : type === 'ticket' ? 's-add-ticket' : type === 'restaurant' ? 's-add-restaurant' : 's-add-flight';
   document.getElementById('ocr-back-btn').onclick = () => go(ocrTargetScreen);
   document.getElementById('ocr-result').style.display = 'none';
   document.getElementById('ocr-preview').style.display = 'none';
@@ -1443,6 +1444,9 @@ function applyOCR() {
     if(ocrData.ticket_name) document.getElementById('ticket-name').value = ocrData.ticket_name;
     if(ocrData.address) document.getElementById('ticket-address').value = ocrData.address;
     if(ocrData.price) document.getElementById('ticket-price').value = ocrData.price;
+  } else if(ocrTargetScreen === 's-add-restaurant') {
+    applyOCRRestaurant();
+    return;
   }
   go(ocrTargetScreen);
   alert('資料已套用！請確認並補充其他欄位');
@@ -1456,7 +1460,166 @@ document.addEventListener('DOMContentLoaded', () => {
   if(hotelOcr) hotelOcr.onclick = () => triggerOCR('hotel');
   const ticketOcr = document.querySelector('#s-add-ticket .ocr-zone');
   if(ticketOcr) ticketOcr.onclick = () => triggerOCR('ticket');
+  const restOcr = document.querySelector('#s-add-restaurant .ocr-zone');
+  if(restOcr) restOcr.onclick = () => triggerOCR('restaurant');
 });
+
+// goTicket function
+function goTicket() {
+  go('s-ticket');
+  loadTickets();
+}
+
+// 簽證到期提醒 - 登入後檢查
+async function checkPassportExpiry() {
+  try {
+    const rows = await loadFromSheet('簽證護照');
+    const today = new Date();
+    const warnings = [];
+    rows.slice(1).forEach(p => {
+      if(!p[8]) return;
+      const expiry = new Date(p[8]);
+      const daysLeft = Math.floor((expiry - today) / (1000*60*60*24));
+      if(daysLeft >= 0 && daysLeft <= 180) {
+        const person = p[2] || '';
+        const type = p[3] || '文件';
+        const country = p[4] || '';
+        warnings.push(`⚠️ ${person} 的${country}${type}將在 ${daysLeft} 天後到期（${p[8]}）`);
+      }
+    });
+    if(warnings.length > 0) {
+      setTimeout(() => alert('【簽證／護照到期提醒】\n\n' + warnings.join('\n')), 800);
+    }
+  } catch(e) {}
+}
+
+// Google 行事曆連動
+async function sendToCalendar() {
+  if(!currentTripId) { alert('請先選擇旅程'); return; }
+  
+  try {
+    const [flights, hotels, tickets, restaurants] = await Promise.all([
+      loadFromSheet('機票'),
+      loadFromSheet('住宿'),
+      loadFromSheet('票券'),
+      loadFromSheet('餐廳')
+    ]);
+    
+    let calLinks = [];
+    
+    // 機票
+    flights.slice(1).filter(r => String(r[1]) === String(currentTripId)).forEach(f => {
+      if(f[6]) {
+        const title = encodeURIComponent((f[3]||'') + ' ' + (f[5]||'') + ' → ' + (f[7]||''));
+        const details = encodeURIComponent('機票號碼：' + (f[4]||'') + '\n訂位代號：' + (f[15]||'') + '\n座位：' + (f[12]||'') + '\n航廈：' + (f[11]||''));
+        // Format: YYYYMMDDTHHMMSS
+        const dep = formatCalDate(f[6]);
+        const arr = formatCalDate(f[8] || f[6]);
+        calLinks.push(`https://calendar.google.com/calendar/render?action=TEMPLATE&text=${title}&dates=${dep}/${arr}&details=${details}`);
+      }
+    });
+    
+    // 飯店
+    hotels.slice(1).filter(r => String(r[1]) === String(currentTripId)).forEach(h => {
+      if(h[5]) {
+        const title = encodeURIComponent('🏨 ' + (h[2]||'飯店') + ' Check-in');
+        const loc = encodeURIComponent(h[3]||'');
+        const details = encodeURIComponent('確認碼：' + (h[7]||'') + '\n房型：' + (h[8]||'') + '\n金額：' + (h[9]||''));
+        const dep = formatCalDate(h[5]);
+        const arr = formatCalDate(h[6] || h[5]);
+        calLinks.push(`https://calendar.google.com/calendar/render?action=TEMPLATE&text=${title}&dates=${dep}/${arr}&details=${details}&location=${loc}`);
+      }
+    });
+    
+    // 餐廳
+    restaurants.slice(1).filter(r => String(r[1]) === String(currentTripId)).forEach(r => {
+      if(r[4]) {
+        const title = encodeURIComponent('🍽️ ' + (r[2]||'餐廳'));
+        const loc = encodeURIComponent(r[3]||'');
+        const details = encodeURIComponent('確認碼：' + (r[7]||'') + '\n人數：' + (r[6]||'') + '\n台灣時間：' + (r[5]||''));
+        const dep = formatCalDate(r[4]);
+        const end = formatCalDateOffset(r[4], 2);
+        calLinks.push(`https://calendar.google.com/calendar/render?action=TEMPLATE&text=${title}&dates=${dep}/${end}&details=${details}&location=${loc}`);
+      }
+    });
+    
+    // 票券
+    tickets.slice(1).filter(r => String(r[1]) === String(currentTripId)).forEach(t => {
+      if(t[6]) {
+        const title = encodeURIComponent('🎫 ' + (t[3]||'票券'));
+        const loc = encodeURIComponent(t[5]||'');
+        const details = encodeURIComponent('票券號碼：' + (t[8]||'') + '\n台灣時間：' + (t[7]||''));
+        const dep = formatCalDate(t[6]);
+        const end = formatCalDateOffset(t[6], 3);
+        calLinks.push(`https://calendar.google.com/calendar/render?action=TEMPLATE&text=${title}&dates=${dep}/${end}&details=${details}&location=${loc}`);
+      }
+    });
+    
+    if(calLinks.length === 0) { alert('這個旅程還沒有行程資料可以新增到行事曆'); return; }
+    
+    // Show calendar modal
+    showCalendarModal(calLinks);
+    
+  } catch(e) {
+    alert('載入行程資料失敗，請重試');
+  }
+}
+
+function formatCalDate(str) {
+  if(!str) return '';
+  // Try to parse datetime-local format: 2025-05-07T14:30 → 20250507T143000
+  const d = new Date(str);
+  if(isNaN(d)) {
+    // Try plain date
+    const parts = str.split(/[-/]/);
+    if(parts.length >= 3) return parts[0]+parts[1].padStart(2,'0')+parts[2].padStart(2,'0')+'T000000';
+    return '';
+  }
+  const pad = n => String(n).padStart(2,'0');
+  return d.getFullYear()+pad(d.getMonth()+1)+pad(d.getDate())+'T'+pad(d.getHours())+pad(d.getMinutes())+'00';
+}
+
+function formatCalDateOffset(str, hours) {
+  const d = new Date(str);
+  if(isNaN(d)) return formatCalDate(str);
+  d.setHours(d.getHours() + hours);
+  const pad = n => String(n).padStart(2,'0');
+  return d.getFullYear()+pad(d.getMonth()+1)+pad(d.getDate())+'T'+pad(d.getHours())+pad(d.getMinutes())+'00';
+}
+
+function showCalendarModal(links) {
+  const labels = links.map((l, i) => {
+    const m = decodeURIComponent(l).match(/text=([^&]+)/);
+    return m ? m[1] : '行程 ' + (i+1);
+  });
+  
+  let html = `<div id="cal-modal" style="position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,0.5);z-index:999;display:flex;align-items:flex-end;">
+    <div style="background:#fff;border-radius:20px 20px 0 0;padding:24px;width:100%;max-height:70vh;overflow-y:auto;">
+      <div style="font-size:16px;font-weight:600;margin-bottom:4px;">📅 新增到 Google 行事曆</div>
+      <div style="font-size:12px;color:#999;margin-bottom:16px;">點選各行程分別新增</div>`;
+  
+  labels.forEach((label, i) => {
+    html += `<a href="${links[i]}" target="_blank" style="display:flex;align-items:center;gap:10px;padding:12px;border:0.5px solid #e5e5e5;border-radius:10px;margin-bottom:8px;text-decoration:none;color:#1a1a1a;">
+      <div style="font-size:20px;">${label.startsWith('🏨')?'🏨':label.startsWith('🍽')?'🍽️':label.startsWith('🎫')?'🎫':'✈️'}</div>
+      <div style="font-size:13px;font-weight:500;">${label}</div>
+      <div style="margin-left:auto;font-size:12px;color:#1a73e8;">新增 ›</div>
+    </a>`;
+  });
+  
+  html += `<button onclick="document.getElementById('cal-modal').remove()" style="width:100%;padding:12px;margin-top:8px;border:0.5px solid #e5e5e5;border-radius:10px;background:none;font-size:14px;color:#666;cursor:pointer;">關閉</button>
+    </div></div>`;
+  
+  document.body.insertAdjacentHTML('beforeend', html);
+}
+
+// OCR for restaurant
+function applyOCRRestaurant() {
+  if(ocrData.hotel_name) document.querySelector('#s-add-restaurant input').value = ocrData.hotel_name;
+  if(ocrData.address) document.querySelectorAll('#s-add-restaurant input')[1].value = ocrData.address;
+  if(ocrData.confirm_code) document.querySelectorAll('#s-add-restaurant input')[5].value = ocrData.confirm_code;
+  go('s-add-restaurant');
+  alert('資料已套用！請確認並補充其他欄位');
+}
 </script>
 
 <!-- 新增餐廳 -->
