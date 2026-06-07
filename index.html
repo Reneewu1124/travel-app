@@ -764,7 +764,13 @@ async function loadTrips() {
     
     let html = '';
     if(upcomingCount > 0) html += '<div class="section-label" style="margin-top:0;">即將到來</div>' + upcomingHTML;
-    if(pastCount > 0) html += '<div class="section-label">過去旅程</div>' + pastHTML;
+    if(pastCount > 0) html += `
+      <div class="section-label" style="cursor:pointer;display:flex;align-items:center;justify-content:space-between;" onclick="togglePastTrips(this)">
+        <span>過去旅程（${pastCount}）</span>
+        <span id="past-trips-arrow">▾</span>
+      </div>
+      <div id="past-trips-container" style="display:none;">${pastHTML}</div>`;
+    if(upcomingCount === 0 && pastCount === 0) html = '<div style="text-align:center;padding:48px 20px;color:#ccc;"><div style="font-size:48px;margin-bottom:12px;">🗺️</div><p style="font-size:14px;">還沒有旅程<br>按「＋ 新旅程」開始吧！</p></div>';
     container.innerHTML = html;
     
   } catch(e) {
@@ -958,6 +964,15 @@ async function loadTripDetail() {
   } catch(e) {
     container.innerHTML = '<div style="text-align:center;padding:24px;color:#999;font-size:13px;">載入失敗</div>';
   }
+}
+
+function togglePastTrips(el) {
+  const container = document.getElementById('past-trips-container');
+  const arrow = document.getElementById('past-trips-arrow');
+  if(!container) return;
+  const isHidden = container.style.display === 'none';
+  container.style.display = isHidden ? '' : 'none';
+  if(arrow) arrow.textContent = isHidden ? '▴' : '▾';
 }
 
 function addExtraTraveler() {
