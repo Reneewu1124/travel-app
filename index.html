@@ -607,31 +607,6 @@ function show(id, v) {
   if (el) el.style.display = v ? '' : 'none';
 }
 
-function applyMode() {
-  const badge = document.getElementById('home-badge');
-  if (isAdmin) {
-    badge.textContent = '管理員';
-    badge.className = 'mode-badge mode-admin';
-  } else {
-    badge.textContent = '查看模式';
-    badge.className = 'mode-badge mode-view';
-  }
-  show('new-trip-btn', isAdmin);
-  show('detail-edit-btn', isAdmin);
-  show('detail-admin-actions', isAdmin);
-  show('flight-add-btn', isAdmin);
-  show('flight-edit-actions', isAdmin);
-  show('hotel-add-btn', isAdmin);
-  show('hotel-edit-actions', isAdmin);
-  show('ticket-add-btn', isAdmin);
-  show('ticket-edit-actions', isAdmin);
-  show('passport-add-btn', isAdmin);
-  show('passport-edit-actions', isAdmin);
-  show('restaurant-add-btn', isAdmin);
-  show('settings-btn', isAdmin);
-  show('timeline-add-btn', isAdmin);
-}
-
 function doLogin() {
   const pwd = document.getElementById('pwd-input').value;
   const err = document.getElementById('pwd-error');
@@ -734,17 +709,6 @@ async function loadTrips() {
     container.innerHTML = '<div style="text-align:center;padding:32px;color:#999;font-size:13px;">載入失敗，請重新整理</div>';
   }
 }
-
-function selectTrip(id, name) {
-  currentTripId = id;
-  currentTripName = name;
-  document.querySelector('#s-detail .topbar-title').textContent = name;
-  go('s-detail');
-  loadTripDetail();
-}
-
-
-
 
 function goFlight() {
   go('s-flight');
