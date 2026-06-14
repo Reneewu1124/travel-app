@@ -988,6 +988,45 @@ async function loadTripDetail() {
   }
 }
 
+function toggleTraveler(el) {
+  const isSelected = el.style.border === '2px solid rgb(26, 26, 26)';
+  if(isSelected) {
+    el.style.border = '0.5px solid #e5e5e5';
+    el.style.opacity = '0.4';
+    const checkId = 'check-' + el.id.replace('traveler-', '');
+    const check = document.getElementById(checkId);
+    if(check) check.textContent = '';
+  } else {
+    el.style.border = '2px solid #1a1a1a';
+    el.style.opacity = '1';
+    const checkId = 'check-' + el.id.replace('traveler-', '');
+    const check = document.getElementById(checkId);
+    if(check) check.textContent = '✓';
+  }
+}
+
+function addExtraTraveler() {
+  const input = document.getElementById('extra-traveler-input');
+  const name = input.value.trim();
+  if(!name) return;
+  const container = document.getElementById('extra-travelers');
+  const id = 'extra-' + Date.now();
+  const initials = name.slice(0,2);
+  const colors = ['#f3e5f5','#fce4ec','#e8f5e9','#fff8e1','#e3f2fd'];
+  const textColors = ['#6a1b9a','#c62828','#2e7d32','#e65100','#1565c0'];
+  const ci = container.children.length % 5;
+  container.insertAdjacentHTML('beforeend', `
+    <div class="card" id="${id}" style="margin-bottom:8px;border:2px solid #1a1a1a;">
+      <div class="card-row">
+        <div style="width:32px;height:32px;border-radius:50%;background:${colors[ci]};display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:600;color:${textColors[ci]};">${initials}</div>
+        <div style="font-size:13px;font-weight:600;">${name}</div>
+        <button onclick="document.getElementById('${id}').remove()" style="margin-left:auto;background:none;border:none;cursor:pointer;color:#ccc;font-size:18px;">✕</button>
+      </div>
+    </div>
+  `);
+  input.value = '';
+}
+
 async function saveTrip() {
   const inputs = document.querySelectorAll('#s-new-trip input');
   const name = inputs[0].value;
