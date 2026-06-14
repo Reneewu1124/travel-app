@@ -526,13 +526,91 @@ textarea{resize:none;}
 
 <script>
 const CLIENT_ID = '1076023430172-89l58tgg1i0sqloc5pdbspqmg86cirrh.apps.googleusercontent.com';
-const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbynlP_OUpheDxe4Y3PTi7YZgpyFVGl-wanRrl5l0NpExiAa1APfuIM4p74EGBO4eko/exec';
+// Airtable 設定
+const AIRTABLE_TOKEN = 'pat5bP1Ha9DtWe2OR.9e74194c373e8557ccfba67bd167a6b328e24aded899806b9b6bd855dfb3b045';
+const AIRTABLE_BASE = 'appg34JR0EZtvk4iD';
+const AIRTABLE_TABLES = {
+  '旅程': 'tbl6ygIDvjgCLmozz',
+  '機票': 'tblJMYE2Iu9PLbnWW',
+  '住宿': 'tblOyiwIB01seFZhG',
+  '餐廳': 'tbl3oFijw2FCIC9tX',
+  '票券': 'tblbtrOSdDr9hU2rX',
+  '簽證護照': 'tbl65a6oEApUm3VX2',
+  '護照': 'tblSXm4S62pbdAjTf'
+};
+
+// 欄位名稱對應（每個表格的欄位順序）
+const AIRTABLE_FIELDS = {
+  '旅程': ['rid','旅程名稱','目的地','出發日期','返回日期','旅客'],
+  '機票': ['rid','旅程ID','旅客','航班號','機票號碼','出發機場','出發時間','抵達機場','抵達時間','台灣時間','飛行時間','航廈','座位','艙等','金額','訂位代號'],
+  '住宿': ['rid','旅程ID','飯店名稱','地址','電話','Check-in','Check-out','確認碼','房型','金額','取消政策','泳池','泳池樓層','泳池時間','健身房','健身房樓層','健身房時間'],
+  '餐廳': ['rid','旅程ID','餐廳名稱','地址','訂位時間','台灣時間','人數','確認碼','取消政策','訂金','訂金金額','備注'],
+  '票券': ['rid','旅程ID','旅客','活動名稱','地點名稱','地址','時間','台灣時間','票券號碼','金額'],
+  '簽證護照': ['rid','旅程ID','旅客','類型','國家','簽證類型','護照號碼','核發日期','到期日期','入境次數','備注','QR碼'],
+  '護照': ['rid','旅客','國籍','護照號碼','到期日期','核發日期','備注']
+};
+
+const AIRTABLE_HEADERS = {
+  'Authorization': `Bearer ${AIRTABLE_TOKEN}`,
+  'Content-Type': 'application/json'
+};
+
+// 快取系統
+const cache = {};
+const CACHE_TIME = 5 * 60 * 1000;
+
+function clearCache() {
+  Object.keys(cache).forEach(k => delete cache[k]);
+}
+
+async function loadFromSheet(sheetName) {
+  const key = sheetName;
+  const now = Date.now();
+  if(cache[key] && (now - cache[key].time) < CACHE_TIME) return cache[key].data;
+
+  try {
+    const tableId = AIRTABLE_TABLES[sheetName];
+    if(!tableId) return [];
+    const res = await fetch(`https://api.airtable.com/v0/${AIRTABLE_BASE}/${tableId}?pageSize=100`, {
+      headers: AIRTABLE_HEADERS
+    });
+    const data = await res.json();
+    const fields = AIRTABLE_FIELDS[sheetName] || [];
+    
+    // Convert to array format matching old Google Sheets format
+    // First row is header
+    const rows = [fields];
+    (data.records || []).forEach(record => {
+      const row = fields.map((f, i) => {
+        if(f === 'rid') return record.id;
+        return record.fields[f] || '';
+      });
+      rows.push(row);
+    });
+    
+    cache[key] = { data: rows, time: now };
+    return rows;
+  } catch(e) {
+    return [];
+  }
+}
 
 async function saveToSheet(sheetName, row) {
   try {
-    await fetch(SCRIPT_URL, {
+    const tableId = AIRTABLE_TABLES[sheetName];
+    if(!tableId) return false;
+    const fields = AIRTABLE_FIELDS[sheetName] || [];
+    
+    const record = {};
+    fields.forEach((f, i) => {
+      if(f === 'rid') return;
+      if(row[i] !== undefined && row[i] !== '') record[f] = String(row[i]);
+    });
+    
+    await fetch(`https://api.airtable.com/v0/${AIRTABLE_BASE}/${tableId}`, {
       method: 'POST',
-      body: JSON.stringify({sheet: sheetName, row: row})
+      headers: AIRTABLE_HEADERS,
+      body: JSON.stringify({ fields: record })
     });
     return true;
   } catch(e) {
@@ -541,35 +619,16 @@ async function saveToSheet(sheetName, row) {
   }
 }
 
-
-// 快取系統
-const cache = {};
-const CACHE_TIME = 5 * 60 * 1000; // 5分鐘
-
-async function loadFromSheet(sheetName) {
-  const key = sheetName + '_' + (currentTripId || '');
-  const now = Date.now();
-  
-  // 有快取且未過期就直接回傳
-  if(cache[key] && (now - cache[key].time) < CACHE_TIME) {
-    return cache[key].data;
-  }
-  
+async function deleteFromSheet(sheetName, id) {
   try {
-    const res = await fetch(SCRIPT_URL + '?sheet=' + sheetName);
-    const data = await res.json();
-    const rows = data.data || [];
-    
-    // 存入快取
-    cache[key] = { data: rows, time: now };
-    return rows;
-  } catch(e) {
-    return [];
-  }
-}
-
-function clearCache() {
-  Object.keys(cache).forEach(k => delete cache[k]);
+    const tableId = AIRTABLE_TABLES[sheetName];
+    if(!tableId) return false;
+    await fetch(`https://api.airtable.com/v0/${AIRTABLE_BASE}/${tableId}/${id}`, {
+      method: 'DELETE',
+      headers: AIRTABLE_HEADERS
+    });
+    return true;
+  } catch(e) { return false; }
 }
 
 let ADMIN_PWD = localStorage.getItem('admin_pwd') || '1234';
@@ -1232,16 +1291,6 @@ async function savePassport() {
   const id = Date.now();
   const ok = await saveToSheet('簽證護照', [id, currentTripId, person, type, country, visaType, passportNo, issueDate, expiry, entries, note, '']);
   if(ok){ clearCache(); alert('新增成功！'); goPassport(); }
-}
-
-async function deleteFromSheet(sheetName, id) {
-  try {
-    await fetch(SCRIPT_URL, {
-      method: 'POST',
-      body: JSON.stringify({sheet: sheetName, action: 'delete', id: id})
-    });
-    return true;
-  } catch(e) { return false; }
 }
 
 async function deleteItem(sheetName, id, callback) {
