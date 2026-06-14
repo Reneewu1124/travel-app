@@ -595,13 +595,46 @@ function show(id, v) {
   if (el) el.style.display = v ? '' : 'none';
 }
 
+// 預載所有資料
+async function preloadData() {
+  try {
+    await Promise.all([
+      loadFromSheet('旅程'),
+      loadFromSheet('機票'),
+      loadFromSheet('住宿'),
+      loadFromSheet('餐廳'),
+      loadFromSheet('票券'),
+      loadFromSheet('簽證護照'),
+    ]);
+  } catch(e) {}
+}
+
+// 自動登入
+function checkAutoLogin() {
+  const saved = localStorage.getItem('travel_login');
+  const savedTime = localStorage.getItem('travel_login_time');
+  if(saved && savedTime) {
+    const days = (Date.now() - parseInt(savedTime)) / (1000*60*60*24);
+    if(days < 30) {
+      isAdmin = saved === 'admin';
+      applyMode(); go('s-home'); loadTrips(); preloadData(); checkPassportExpiry();
+    }
+  }
+}
+
 function doLogin() {
   const pwd = document.getElementById('pwd-input').value;
   const err = document.getElementById('pwd-error');
   if (pwd === ADMIN_PWD) {
-    isAdmin = true; applyMode(); go('s-home'); err.textContent = ''; loadTrips(); checkPassportExpiry();
+    isAdmin = true;
+    localStorage.setItem('travel_login', 'admin');
+    localStorage.setItem('travel_login_time', String(Date.now()));
+    applyMode(); go('s-home'); err.textContent = ''; loadTrips(); preloadData(); checkPassportExpiry();
   } else if (pwd === VIEW_PWD) {
-    isAdmin = false; applyMode(); go('s-home'); err.textContent = ''; loadTrips(); checkPassportExpiry();
+    isAdmin = false;
+    localStorage.setItem('travel_login', 'view');
+    localStorage.setItem('travel_login_time', String(Date.now()));
+    applyMode(); go('s-home'); err.textContent = ''; loadTrips(); preloadData(); checkPassportExpiry();
   } else {
     err.textContent = '密碼錯誤，請再試一次';
   }
@@ -609,6 +642,8 @@ function doLogin() {
 
 function doLogout() {
   isAdmin = false;
+  localStorage.removeItem('travel_login');
+  localStorage.removeItem('travel_login_time');
   document.getElementById('pwd-input').value = '';
   document.getElementById('pwd-error').textContent = '';
   go('s-login');
@@ -1666,6 +1701,7 @@ document.addEventListener('DOMContentLoaded', () => {
   if(hotelOcr) hotelOcr.onclick = () => triggerOCR('hotel');
   const ticketOcr = document.querySelector('#s-add-ticket .ocr-zone');
   if(ticketOcr) ticketOcr.onclick = () => triggerOCR('ticket');
+  checkAutoLogin();
 });
 </script>
 
