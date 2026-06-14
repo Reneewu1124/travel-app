@@ -1615,6 +1615,7 @@ function applyMode() {
   show('mypassport-add-btn', isAdmin);
 }
 
+document.addEventListener('DOMContentLoaded', () => {
   const flightOcr = document.querySelector('#s-add-flight .ocr-zone');
   if(flightOcr) flightOcr.onclick = () => triggerOCR('flight');
   const hotelOcr = document.querySelector('#s-add-hotel .ocr-zone');
