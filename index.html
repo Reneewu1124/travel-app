@@ -596,10 +596,9 @@ function go(id) {
 function sp(el) {
   el.closest('.person-row').querySelectorAll('.person-pill').forEach(p => p.classList.remove('active'));
   el.classList.add('active');
-  // Reload detail if on detail screen
-  if(document.getElementById('s-detail').classList.contains('active')) {
-    loadTripDetail();
-  }
+  if(document.getElementById('s-detail').classList.contains('active')) loadTripDetail();
+  if(document.getElementById('s-flight').classList.contains('active')) loadFlights();
+  if(document.getElementById('s-passport').classList.contains('active')) loadPassports();
 }
 
 function show(id, v) {
@@ -710,9 +709,29 @@ async function loadTrips() {
   }
 }
 
+function formatDisplayTime(str) {
+  if(!str) return '';
+  // Already clean format like "2026-08-01 13:30"
+  if(str.match(/^\d{4}-\d{2}-\d{2} \d{2}:\d{2}/)) return str;
+  // ISO format - convert to local display
+  const d = new Date(str);
+  if(isNaN(d)) return str;
+  const pad = n => String(n).padStart(2,'0');
+  return d.getFullYear() + '-' + pad(d.getMonth()+1) + '-' + pad(d.getDate()) + ' ' + pad(d.getHours()) + ':' + pad(d.getMinutes());
+}
+
 function goFlight() {
   go('s-flight');
+  updateTravelerPills('s-flight');
   loadFlights();
+}
+
+function updateTravelerPills(screenId) {
+  const row = document.querySelector('#' + screenId + ' .person-row');
+  if(!row) return;
+  row.innerHTML = currentTripTravelers.map((p,i) =>
+    `<div class="person-pill ${i===0?'active':''}" onclick="sp(this)">${p}</div>`
+  ).join('');
 }
 
 async function loadFlights() {
@@ -735,11 +754,12 @@ async function loadFlights() {
     
     let html = '';
     flights.forEach(f => {
+      const fid = f[0];
       const depCode = f[5] || '';
       const arrCode = f[7] || '';
-      const depTime = f[6] || '';
-      const arrTime = f[8] || '';
-      const twTime = f[9] || '';
+      const depTime = formatDisplayTime(f[6]);
+      const arrTime = formatDisplayTime(f[8]);
+      const twTime = formatDisplayTime(f[9]);
       const duration = f[10] || '';
       const terminal = f[11] || '';
       const seat = f[12] || '';
@@ -753,13 +773,11 @@ async function loadFlights() {
         <div class="flight-route">
           <div class="flight-airport">
             <div class="flight-code">${depCode}</div>
-            <div class="flight-city"></div>
             <div class="flight-time">${depTime}</div>
           </div>
           <div style="opacity:0.4;font-size:24px;">→</div>
           <div class="flight-airport" style="text-align:right;">
             <div class="flight-code">${arrCode}</div>
-            <div class="flight-city"></div>
             <div class="flight-time">${arrTime}</div>
           </div>
         </div>
@@ -775,8 +793,9 @@ async function loadFlights() {
         ${ticketNo ? '<div class="field-row"><span class="field-label">機票號碼</span><span class="field-value">'+ticketNo+'</span></div>' : ''}
         ${pnr ? '<div class="field-row"><span class="field-label">訂位代號</span><span class="field-value">'+pnr+'</span></div>' : ''}
         ${depTime ? '<div class="field-row"><span class="field-label">出發時間</span><span class="field-value">'+depTime+'</span></div>' : ''}
-        ${arrTime ? '<div class="field-row"><span class="field-label">抵達時間</span><span class="field-value">'+arrTime+(twTime ? '<br><small style=\"color:#999;font-size:11px;\">(台灣時間 '+twTime+')</small>' : '')+'</span></div>' : ''}
+        ${arrTime ? '<div class="field-row"><span class="field-label">抵達時間</span><span class="field-value">'+arrTime+(twTime ? '<br><small style="color:#999;font-size:11px;">(台灣時間 '+twTime+')</small>' : '')+'</span></div>' : ''}
         ${price ? '<div class="field-row"><span class="field-label">金額</span><span class="field-value">'+price+'</span></div>' : ''}
+        ${isAdmin ? '<div class="btn-row" style="margin-top:8px;"><button class="btn-delete" style="flex:1;justify-content:center;" onclick="deleteItem(\'機票\',\''+fid+'\',()=>{clearCache();loadFlights();})">🗑 刪除</button></div>' : ''}
       </div>`;
     });
     
@@ -813,6 +832,7 @@ async function loadTripDetail() {
     const myTickets = tickets.slice(1).filter(r => String(r[1]) === String(currentTripId) && r[2] === activePerson);
     const myPassports = passports.slice(1).filter(r => String(r[1]) === String(currentTripId) && r[2] === activePerson);
     const tripHotels = hotels.slice(1).filter(r => String(r[1]) === String(currentTripId));
+    const tripRestaurants = (await loadFromSheet('餐廳')).slice(1).filter(r => String(r[1]) === String(currentTripId));
     
     // Personal section
     let personalHTML = '';
@@ -859,7 +879,17 @@ async function loadTripDetail() {
       sharedHTML += `<div class="card clickable" onclick="goHotel()">
         <div class="card-row">
           <div class="card-icon green">🏨</div>
-          <div><div class="card-title">${h[2] || '飯店'}</div><div class="card-sub">${h[5] ? h[5]+' Check-in' : ''}</div></div>
+          <div><div class="card-title">${h[2] || '飯店'}</div><div class="card-sub">${h[5] ? formatDisplayTime(h[5])+' Check-in' : ''}</div></div>
+          <div class="card-chevron">›</div>
+        </div>
+      </div>`;
+    });
+
+    tripRestaurants.forEach(r => {
+      sharedHTML += `<div class="card clickable" onclick="goRestaurant()">
+        <div class="card-row">
+          <div class="card-icon coral">🍽️</div>
+          <div><div class="card-title">${r[2] || '餐廳'}</div><div class="card-sub">${formatDisplayTime(r[4]) || ''} ${r[6] ? '・'+r[6]+'位' : ''}</div></div>
           <div class="card-chevron">›</div>
         </div>
       </div>`;
@@ -952,26 +982,28 @@ async function loadHotel() {
     }
     let html = '';
     hotels.forEach(h => {
+      const hid = h[0];
       const pool = h[11] || '';
       const poolFloor = h[12] || '';
       const poolTime = h[13] || '';
       const gym = h[14] || '';
       const gymFloor = h[15] || '';
       const gymTime = h[16] || '';
-      html += `<div class="card" style="cursor:default;">
+      html += `<div class="card">
         <div class="card-row" style="margin-bottom:10px;">
           <div class="card-icon green">🏨</div>
-          <div><div class="card-title">${h[2]||''}</div><div class="card-sub">${h[5]||''} — ${h[6]||''}</div></div>
+          <div><div class="card-title">${h[2]||''}</div><div class="card-sub">${formatDisplayTime(h[5])||''} — ${formatDisplayTime(h[6])||''}</div></div>
         </div>
         <div style="border-top:0.5px solid #f0f0f0;padding-top:10px;">
-          ${h[3] ? '<div class="field-row"><span class="field-label">地址</span><span class="field-value link" onclick="openMap(this.dataset.addr)" data-addr="'+h[3]+'">📍 '+h[3]+'</span></div>' : ''}
+          ${h[3] ? '<div class="field-row"><span class="field-label">地址</span><span class="field-value link" onclick="openMap(\''+h[3]+'\')">📍 '+h[3]+'</span></div>' : ''}
           ${h[4] ? '<div class="field-row"><span class="field-label">電話</span><span class="field-value">'+h[4]+'</span></div>' : ''}
-          ${h[5] ? '<div class="field-row"><span class="field-label">Check-in</span><span class="field-value">'+h[5]+'</span></div>' : ''}
-          ${h[6] ? '<div class="field-row"><span class="field-label">Check-out</span><span class="field-value">'+h[6]+'</span></div>' : ''}
+          ${h[5] ? '<div class="field-row"><span class="field-label">Check-in</span><span class="field-value">'+formatDisplayTime(h[5])+'</span></div>' : ''}
+          ${h[6] ? '<div class="field-row"><span class="field-label">Check-out</span><span class="field-value">'+formatDisplayTime(h[6])+'</span></div>' : ''}
           ${h[7] ? '<div class="field-row"><span class="field-label">確認碼</span><span class="field-value">'+h[7]+'</span></div>' : ''}
           ${h[8] ? '<div class="field-row"><span class="field-label">房型</span><span class="field-value">'+h[8]+'</span></div>' : ''}
           ${h[9] ? '<div class="field-row"><span class="field-label">金額</span><span class="field-value">'+h[9]+'</span></div>' : ''}
           ${h[10] ? '<div class="field-row"><span class="field-label">取消政策</span><span class="field-value">'+h[10]+'</span></div>' : ''}
+          ${isAdmin ? '<div class="btn-row" style="margin-top:8px;"><button class="btn-delete" style="flex:1;justify-content:center;" onclick="deleteItem(\'住宿\',\''+hid+'\',()=>{clearCache();loadHotel();})">🗑 刪除</button></div>' : ''}
         </div>
       </div>
       ${(pool || gym) ? `<div class="section-label">飯店設施</div>
@@ -1095,15 +1127,15 @@ async function loadRestaurantPage() {
     }
     let html = '';
     restaurants.forEach(r => {
-      html += `<div class="card" style="cursor:default;">
+      const rid = r[0];
+      html += `<div class="card">
         <div class="card-row" style="margin-bottom:10px;">
           <div class="card-icon coral">🍽️</div>
-          <div><div class="card-title">${r[2]||''}</div><div class="card-sub">${r[4]||''} ${r[6]?'・'+r[6]+'位':''}</div></div>
+          <div><div class="card-title">${r[2]||''}</div><div class="card-sub">${formatDisplayTime(r[4])||''} ${r[6]?'・'+r[6]+'位':''}</div></div>
         </div>
         <div style="border-top:0.5px solid #f0f0f0;padding-top:10px;">
-          ${r[3] ? '<div class="field-row"><span class="field-label">地址</span><span class="field-value link" onclick="openMap(this.dataset.addr)" data-addr="'+r[3]+'">📍 '+r[3]+'</span></div>' : ''}
-          ${r[4] ? '<div class="field-row"><span class="field-label">訂位時間</span><span class="field-value">'+r[4]+'</span></div>' : ''}
-          ${r[5] ? '<div class="field-row"><span class="field-label">台灣時間</span><span class="field-value" style="color:#999;">'+r[5]+'</span></div>' : ''}
+          ${r[3] ? '<div class="field-row"><span class="field-label">地址</span><span class="field-value link" onclick="openMap(\''+r[3]+'\')">📍 '+r[3]+'</span></div>' : ''}
+          ${r[4] ? '<div class="field-row"><span class="field-label">訂位時間</span><span class="field-value">'+formatDisplayTime(r[4])+'</span></div>' : ''}
           ${r[6] ? '<div class="field-row"><span class="field-label">人數</span><span class="field-value">'+r[6]+'位</span></div>' : ''}
           ${r[7] ? '<div class="field-row"><span class="field-label">確認碼</span><span class="field-value">'+r[7]+'</span></div>' : ''}
           ${r[8] ? '<div class="field-row"><span class="field-label">取消政策</span><span class="field-value">'+r[8]+'</span></div>' : ''}
@@ -1111,6 +1143,7 @@ async function loadRestaurantPage() {
           ${r[10] ? '<div class="field-row"><span class="field-label">訂金金額</span><span class="field-value">'+r[10]+'</span></div>' : ''}
           ${r[11] ? '<div class="field-row"><span class="field-label">備注</span><span class="field-value">'+r[11]+'</span></div>' : ''}
         </div>
+        ${isAdmin ? '<div class="btn-row" style="margin-top:8px;"><button class="btn-delete" style="flex:1;justify-content:center;" onclick="deleteItem(\'餐廳\',\''+rid+'\',()=>{clearCache();goRestaurant();})">🗑 刪除</button></div>' : ''}
       </div>`;
     });
     container.innerHTML = html;
@@ -1179,21 +1212,37 @@ async function savePassport() {
   if(ok){ clearCache(); alert('新增成功！'); goPassport(); }
 }
 
-async function saveRestaurant() {
-  const inputs = document.querySelectorAll('#s-add-restaurant input');
+async function deleteFromSheet(sheetName, id) {
+  try {
+    await fetch(SCRIPT_URL, {
+      method: 'POST',
+      body: JSON.stringify({sheet: sheetName, action: 'delete', id: id})
+    });
+    return true;
+  } catch(e) { return false; }
+}
+
+async function deleteItem(sheetName, id, callback) {
+  if(!confirm('確定要刪除嗎？')) return;
+  const ok = await deleteFromSheet(sheetName, id);
+  clearCache();
+  if(callback) callback();
+}
+  const inputs = document.querySelectorAll('#s-add-restaurant input[type=text], #s-add-restaurant input[type=number]');
   const name = inputs[0]?.value || '';
   const address = inputs[1]?.value || '';
-  const time = inputs[2]?.value || '';
-  const twTime = inputs[3]?.value || '';
-  const people = inputs[4]?.value || '';
-  const code = inputs[5]?.value || '';
-  const cancel = inputs[6]?.value || '';
-  const deposit = inputs[7]?.value || '';
-  const depositAmt = inputs[8]?.value || '';
+  const rDate = document.getElementById('r-date')?.value || '';
+  const rTime = document.getElementById('r-time')?.value || '';
+  const time = rDate && rTime ? rDate + ' ' + rTime : rDate || rTime;
+  const people = inputs[2]?.value || '';
+  const code = inputs[3]?.value || '';
+  const cancel = inputs[4]?.value || '';
+  const deposit = inputs[5]?.value || '';
+  const depositAmt = inputs[6]?.value || '';
   const note = document.querySelector('#s-add-restaurant textarea')?.value || '';
   if(!name){ alert('請填寫餐廳名稱'); return; }
   const id = Date.now();
-  const ok = await saveToSheet('餐廳', [id, currentTripId, name, address, time, twTime, people, code, cancel, deposit, depositAmt, note]);
+  const ok = await saveToSheet('餐廳', [id, currentTripId, name, address, time, '', people, code, cancel, deposit, depositAmt, note]);
   if(ok){ clearCache(); alert('餐廳新增成功！'); go('s-detail'); loadTripDetail(); }
 }
 
@@ -1639,8 +1688,8 @@ document.addEventListener('DOMContentLoaded', () => {
     <div class="divider">或手動輸入</div>
     <label class="form-label" style="margin-top:8px;">餐廳名稱</label><input type="text" placeholder="如：Kahala 日本料理">
     <label class="form-label">地址（連結 Google Map）</label><input type="text" placeholder="輸入地址">
-    <label class="form-label">訂位時間（當地）</label><input type="text" placeholder="如：5/8 19:00">
-    <label class="form-label">台灣時間備注</label><input type="text" placeholder="如：台灣時間 18:00">
+    <label class="form-label">訂位日期 / 時間（當地）</label>
+    <div class="grid-2"><input type="date" id="r-date"><input type="time" id="r-time"></div>
     <label class="form-label">人數</label><input type="number" placeholder="如：3">
     <label class="form-label">確認碼</label><input type="text" placeholder="訂位確認碼">
     <label class="form-label">取消政策</label><input type="text" placeholder="如：最晚24小時前免費取消">
