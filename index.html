@@ -1228,6 +1228,8 @@ async function deleteItem(sheetName, id, callback) {
   clearCache();
   if(callback) callback();
 }
+
+async function saveRestaurant() {
   const inputs = document.querySelectorAll('#s-add-restaurant input[type=text], #s-add-restaurant input[type=number]');
   const name = inputs[0]?.value || '';
   const address = inputs[1]?.value || '';
