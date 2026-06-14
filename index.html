@@ -489,15 +489,20 @@ textarea{resize:none;}
     <label class="form-label">目的地</label><input type="text" placeholder="如：日本・大阪">
     <label class="form-label">出發 / 返回日期</label>
     <div class="grid-2"><input type="date"><input type="date"></div>
-    <div class="section-label">旅客</div>
-    <div class="card" style="margin-bottom:8px;">
-      <div class="card-row"><div style="width:32px;height:32px;border-radius:50%;background:#e3f2fd;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:600;color:#1565c0;">小米</div><div style="font-size:13px;font-weight:600;">許書綺（小米）</div><div style="margin-left:auto;color:#2e7d32;">✓</div></div>
+    <div class="section-label">旅客（點選參加的人）</div>
+    <div class="card clickable" id="traveler-mimi" onclick="toggleTraveler(this)" style="margin-bottom:8px;border:2px solid #1a1a1a;">
+      <div class="card-row"><div style="width:32px;height:32px;border-radius:50%;background:#e3f2fd;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:600;color:#1565c0;">小米</div><div style="font-size:13px;font-weight:600;">許書綺（小米）</div><div style="margin-left:auto;font-size:18px;" id="check-mimi">✓</div></div>
     </div>
-    <div class="card" style="margin-bottom:8px;">
-      <div class="card-row"><div style="width:32px;height:32px;border-radius:50%;background:#fff8e1;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:600;color:#e65100;">馬哥</div><div style="font-size:13px;font-weight:600;">倪子鈞（馬哥）</div><div style="margin-left:auto;color:#2e7d32;">✓</div></div>
+    <div class="card clickable" id="traveler-mage" onclick="toggleTraveler(this)" style="margin-bottom:8px;border:2px solid #1a1a1a;">
+      <div class="card-row"><div style="width:32px;height:32px;border-radius:50%;background:#fff8e1;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:600;color:#e65100;">馬哥</div><div style="font-size:13px;font-weight:600;">倪子鈞（馬哥）</div><div style="margin-left:auto;font-size:18px;" id="check-mage">✓</div></div>
     </div>
-    <div class="card" style="margin-bottom:8px;">
-      <div class="card-row"><div style="width:32px;height:32px;border-radius:50%;background:#e8f5e9;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:600;color:#2e7d32;">Sa</div><div style="font-size:13px;font-weight:600;">倪希米（Samie）</div><div style="margin-left:auto;color:#2e7d32;">✓</div></div>
+    <div class="card clickable" id="traveler-samie" onclick="toggleTraveler(this)" style="margin-bottom:8px;border:2px solid #1a1a1a;">
+      <div class="card-row"><div style="width:32px;height:32px;border-radius:50%;background:#e8f5e9;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:600;color:#2e7d32;">Sa</div><div style="font-size:13px;font-weight:600;">倪希米（Samie）</div><div style="margin-left:auto;font-size:18px;" id="check-samie">✓</div></div>
+    </div>
+    <div id="extra-travelers"></div>
+    <div style="display:flex;gap:8px;margin-top:4px;margin-bottom:4px;">
+      <input type="text" id="extra-traveler-input" placeholder="如：媽媽、外傭 Jenny" style="flex:1;">
+      <button onclick="addExtraTraveler()" style="padding:10px 16px;background:#1a1a1a;color:#fff;border:none;border-radius:8px;font-size:13px;cursor:pointer;white-space:nowrap;">＋ 新增</button>
     </div>
     <div class="btn-row" style="margin-top:16px;">
       <button class="btn-secondary" onclick="go('s-home')" style="flex:1;">取消</button>
