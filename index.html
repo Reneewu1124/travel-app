@@ -608,31 +608,6 @@ function show(id, v) {
   if (el) el.style.display = v ? '' : 'none';
 }
 
-function applyMode() {
-  const badge = document.getElementById('home-badge');
-  if (isAdmin) {
-    badge.textContent = '管理員';
-    badge.className = 'mode-badge mode-admin';
-  } else {
-    badge.textContent = '查看模式';
-    badge.className = 'mode-badge mode-view';
-  }
-  show('new-trip-btn', isAdmin);
-  show('detail-edit-btn', isAdmin);
-  show('detail-admin-actions', isAdmin);
-  show('flight-add-btn', isAdmin);
-  show('flight-edit-actions', isAdmin);
-  show('hotel-add-btn', isAdmin);
-  show('hotel-edit-actions', isAdmin);
-  show('ticket-add-btn', isAdmin);
-  show('ticket-edit-actions', isAdmin);
-  show('passport-add-btn', isAdmin);
-  show('passport-edit-actions', isAdmin);
-  show('restaurant-add-btn', isAdmin);
-  show('settings-btn', isAdmin);
-  show('timeline-add-btn', isAdmin);
-}
-
 function doLogin() {
   const pwd = document.getElementById('pwd-input').value;
   const err = document.getElementById('pwd-error');
@@ -1570,6 +1545,8 @@ function applyMode() {
   show('mypassport-add-btn', isAdmin);
 }
 
+// 修改密碼
+function changePassword() {
   const adminPwd = document.getElementById('new-admin-pwd').value;
   const viewPwd = document.getElementById('new-view-pwd').value;
   const confirmPwd = document.getElementById('confirm-view-pwd').value;
