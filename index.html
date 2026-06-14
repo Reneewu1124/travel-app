@@ -409,19 +409,8 @@ textarea{resize:none;}
     <button class="btn-edit" id="ticket-add-btn" style="display:none;">＋ 新增</button>
   </div>
   <div class="content">
-    <div class="person-row">
-      <div class="person-pill active" onclick="sp(this)">全部</div>
-      <div class="person-pill" onclick="sp(this)">小米</div>
-      <div class="person-pill" onclick="sp(this)">馬哥</div>
-      <div class="person-pill" onclick="sp(this)">Samie</div>
-    </div>
     <div id="ticket-container"></div>
-    <div id="ticket-edit-actions" style="display:none;">
-      <div class="btn-row">
-        <button class="btn-edit" style="flex:1;justify-content:center;">✏️ 編輯</button>
-        <button class="btn-delete" style="flex:1;justify-content:center;">🗑 刪除</button>
-      </div>
-    </div>
+    <div id="ticket-edit-actions" style="display:none;"></div>
   </div>
   <div class="tab-bar">
     <button class="tab-item " onclick="go('s-home')"><svg viewBox="0 0 24 24"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>總覽</button>
@@ -1028,30 +1017,28 @@ function goHotel() {
 async function loadTickets() {
   const container = document.getElementById('ticket-container');
   if(!container) return;
-  const activePerson = document.querySelector('#s-ticket .person-pill.active')?.textContent || '全部';
   container.innerHTML = '<div style="text-align:center;padding:24px;color:#999;font-size:13px;">載入中...</div>';
   try {
     const rows = await loadFromSheet('票券');
-    let tickets = rows.slice(1).filter(r => String(r[1]) === String(currentTripId));
-    if(activePerson !== '全部') tickets = tickets.filter(r => r[2] === activePerson);
+    const tickets = rows.slice(1).filter(r => String(r[1]) === String(currentTripId));
     if(tickets.length === 0) {
       container.innerHTML = '<div style="text-align:center;padding:40px 20px;color:#ccc;"><div style="font-size:40px;margin-bottom:10px;">🎫</div><p style="font-size:13px;">尚未新增票券</p></div>';
       return;
     }
     let html = '';
     tickets.forEach(t => {
-      html += `<div class="card" style="cursor:default;">
+      const tid = t[0];
+      html += `<div class="card">
         <div class="card-row" style="margin-bottom:10px;">
           <div class="card-icon amber">🎫</div>
-          <div><div class="card-title">${t[3]||''}</div><div class="card-sub">${t[6]||''}</div></div>
+          <div><div class="card-title">${t[3]||''}</div><div class="card-sub">${formatDisplayTime(t[6])||''}</div></div>
         </div>
         <div style="border-top:0.5px solid #f0f0f0;padding-top:10px;">
-          ${t[4] ? '<div class="field-row"><span class="field-label">地點</span><span class="field-value link" onclick="openMap(this.dataset.addr)" data-addr="'+t[5]+'">📍 '+t[4]+'</span></div>' : ''}
-          ${t[6] ? '<div class="field-row"><span class="field-label">當地時間</span><span class="field-value">'+t[6]+'</span></div>' : ''}
-          ${t[7] ? '<div class="field-row"><span class="field-label">台灣時間</span><span class="field-value" style="color:#999;">'+t[7]+'</span></div>' : ''}
+          ${t[4] ? '<div class="field-row"><span class="field-label">地點</span><span class="field-value link" onclick="openMap(\''+t[5]+'\')">📍 '+t[4]+'</span></div>' : ''}
+          ${t[6] ? '<div class="field-row"><span class="field-label">時間</span><span class="field-value">'+formatDisplayTime(t[6])+'</span></div>' : ''}
           ${t[8] ? '<div class="field-row"><span class="field-label">票券號碼</span><span class="field-value">'+t[8]+'</span></div>' : ''}
           ${t[9] ? '<div class="field-row"><span class="field-label">金額</span><span class="field-value">'+t[9]+'</span></div>' : ''}
-          ${t[2] ? '<div style="margin-top:8px;"><span style="font-size:11px;padding:3px 8px;border-radius:20px;background:#fff8e1;color:#e65100;">'+t[2]+'</span></div>' : ''}
+          ${isAdmin ? '<div class="btn-row" style="margin-top:8px;"><button class="btn-delete" style="flex:1;justify-content:center;" onclick="deleteItem(\'票券\',\''+tid+'\',()=>{clearCache();loadTickets();})">🗑 刪除</button></div>' : ''}
         </div>
       </div>`;
     });
@@ -1365,18 +1352,24 @@ async function savePassportNew() {
 }
 
 // 新增票券
+function updatePassportLabel() {
+  const type = document.getElementById('passport-type-select')?.value;
+  const label = document.getElementById('passport-no-label');
+  if(label) label.textContent = type === '簽證' ? '簽證號碼' : '護照號碼';
+}
+
 async function saveTicket() {
-  const person = document.querySelector('#s-add-ticket .person-pill.active')?.textContent || '';
   const name = document.getElementById('ticket-name')?.value || '';
   const place = document.getElementById('ticket-place')?.value || '';
   const address = document.getElementById('ticket-address')?.value || '';
-  const datetime = document.getElementById('ticket-datetime')?.value || '';
-  const twtime = document.getElementById('ticket-twtime')?.value || '';
+  const tDate = document.getElementById('ticket-date')?.value || '';
+  const tTime = document.getElementById('ticket-time')?.value || '';
+  const datetime = tDate && tTime ? tDate + ' ' + tTime : tDate || tTime;
   const ticketNo = document.getElementById('ticket-no')?.value || '';
   const price = document.getElementById('ticket-price')?.value || '';
-  if(!name) { alert('請填寫票券名稱'); return; }
+  if(!name) { alert('請填寫活動名稱'); return; }
   const id = Date.now();
-  const ok = await saveToSheet('票券', [id, currentTripId, person, name, place, address, datetime, twtime, ticketNo, price]);
+  const ok = await saveToSheet('票券', [id, currentTripId, '', name, place, address, datetime, '', ticketNo, price]);
   if(ok) { clearCache(); alert('票券新增成功！'); goTimeline(); }
 }
 
@@ -1742,13 +1735,13 @@ document.addEventListener('DOMContentLoaded', () => {
       <div class="person-pill" onclick="sp(this)">Samie</div>
     </div>
     <label class="form-label">類型</label>
-    <select id="passport-type-select">
+    <select id="passport-type-select" onchange="updatePassportLabel()">
       <option value="護照">護照</option>
       <option value="簽證">簽證</option>
     </select>
-    <label class="form-label">國家／地區</label><input type="text" placeholder="如：日本">
-    <label class="form-label">簽證類型</label><input type="text" placeholder="如：觀光簽證、免簽">
-    <label class="form-label">護照號碼</label><input type="text" placeholder="如：A123456789">
+    <label class="form-label">國家／地區</label><input type="text" placeholder="如：法國">
+    <label class="form-label">簽證類型</label><input type="text" placeholder="如：申根簽證、免簽">
+    <label class="form-label" id="passport-no-label">護照號碼</label><input type="text" placeholder="如：A123456789">
     <label class="form-label">核發日期</label><input type="date">
     <label class="form-label">到期日期</label><input type="date">
     <label class="form-label">入境次數</label><input type="text" placeholder="如：多次、單次">
@@ -1773,17 +1766,11 @@ document.addEventListener('DOMContentLoaded', () => {
       📷<br>拍照或上傳截圖<br><small style="font-size:11px;">AI 自動辨識帶入欄位</small>
     </div>
     <div class="divider">或手動輸入</div>
-    <div class="section-label" style="margin-top:8px;">旅客</div>
-    <div class="person-row">
-      <div class="person-pill active" onclick="sp(this)">小米</div>
-      <div class="person-pill" onclick="sp(this)">馬哥</div>
-      <div class="person-pill" onclick="sp(this)">Samie</div>
-    </div>
-    <label class="form-label">票券名稱</label><input type="text" id="ticket-name" placeholder="如：KidZania 下午場">
-    <label class="form-label">地點名稱</label><input type="text" id="ticket-place" placeholder="如：Kidzania Koshien">
+    <label class="form-label" style="margin-top:8px;">活動名稱</label><input type="text" id="ticket-name" placeholder="如：羅浮宮門票">
+    <label class="form-label">地點名稱</label><input type="text" id="ticket-place" placeholder="如：Musée du Louvre">
     <label class="form-label">地址（連結 Google Map）</label><input type="text" id="ticket-address" placeholder="輸入地址">
-    <label class="form-label">日期時間（當地）</label><input type="datetime-local" id="ticket-datetime">
-    <label class="form-label">台灣時間備注</label><input type="text" id="ticket-twtime" placeholder="如：台灣時間 15:00">
+    <label class="form-label">日期 / 時間（當地）</label>
+    <div class="grid-2"><input type="date" id="ticket-date"><input type="time" id="ticket-time"></div>
     <label class="form-label">票券號碼</label><input type="text" id="ticket-no" placeholder="票券號碼">
     <label class="form-label">金額</label><input type="text" id="ticket-price" placeholder="如：JPY 12,800">
     <div class="btn-row" style="margin-top:16px;">
