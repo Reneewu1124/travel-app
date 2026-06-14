@@ -712,19 +712,19 @@ async function loadTrips() {
   }
 }
 
-function selectTrip(id, name) {
-  currentTripId = id;
-  currentTripName = name;
-  document.querySelector('#s-detail .topbar-title').textContent = name;
-  go('s-detail');
-  loadTripDetail();
+var currentTripTravelers = ['小米','馬哥','Samie'];
+
+function updateTravelerPills(screenId) {
+  const row = document.querySelector('#' + screenId + ' .person-row');
+  if(!row) return;
+  row.innerHTML = currentTripTravelers.map((p,i) =>
+    `<div class="person-pill ${i===0?'active':''}" onclick="sp(this)">${p}</div>`
+  ).join('');
 }
-
-
-
 
 function goFlight() {
   go('s-flight');
+  updateTravelerPills('s-flight');
   loadFlights();
 }
 
@@ -1345,14 +1345,19 @@ async function saveTrip() {
 function selectTrip(id, name, travelers) {
   currentTripId = id;
   currentTripName = name;
+  currentTripTravelers = travelers ? travelers.split(',') : ['小米','馬哥','Samie'];
+  
   document.querySelector('#s-detail .topbar-title').textContent = name;
-  const travelerList = travelers ? travelers.split(',') : ['小米','馬哥','Samie'];
-  const detailPersonRow = document.querySelector('#s-detail .person-row');
-  if(detailPersonRow) {
-    detailPersonRow.innerHTML = travelerList.map((p,i) =>
+  
+  // Update person pills in all relevant screens
+  ['s-detail','s-flight','s-add-flight','s-add-restaurant','s-add-ticket','s-add-passport','s-passport'].forEach(screenId => {
+    const row = document.querySelector('#' + screenId + ' .person-row');
+    if(!row) return;
+    row.innerHTML = currentTripTravelers.map((p,i) =>
       `<div class="person-pill ${i===0?'active':''}" onclick="sp(this)">${p}</div>`
     ).join('');
-  }
+  });
+  
   go('s-detail');
   loadTripDetail();
 }
