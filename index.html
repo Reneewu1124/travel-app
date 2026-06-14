@@ -239,7 +239,7 @@ textarea{resize:none;}
     <div id="detail-admin-actions" style="display:none;">
       <div class="spacer"></div>
       <button class="add-card" onclick="go('s-add-item')">＋ 新增資料</button>
-      <button class="btn-primary" onclick="sendToCalendar()" style="display:flex;align-items:center;justify-content:center;gap:8px;">
+      <button class="btn-primary" style="display:flex;align-items:center;justify-content:center;gap:8px;">
         📅 發送至 Google 行事曆
       </button>
     </div>
@@ -449,7 +449,7 @@ textarea{resize:none;}
   </div>
 </div>
 
-<!-- 簽證護照（從旅程進入，有tripId過濾） -->
+<!-- 簽證護照 -->
 <div class="screen" id="s-passport">
   <div class="topbar">
     <button class="icon-btn" onclick="go('s-detail')">←</button>
@@ -463,59 +463,24 @@ textarea{resize:none;}
       <div class="person-pill" onclick="sp(this)">Samie</div>
     </div>
     <div id="passport-container"></div>
-    <div class="spacer"></div>
-  </div>
-</div>
-
-<!-- 護照總覽（底部tab，不過濾旅程） -->
-<div class="screen" id="s-mypassport">
-  <div class="topbar">
-    <div class="topbar-title">🛂 護照資料</div>
-    <button class="btn-edit" id="mypassport-add-btn" onclick="go('s-add-mypassport')" style="display:none;">＋ 新增</button>
-  </div>
-  <div class="content">
-    <div class="person-row">
-      <div class="person-pill active" onclick="spMyPassport(this)">小米</div>
-      <div class="person-pill" onclick="spMyPassport(this)">馬哥</div>
-      <div class="person-pill" onclick="spMyPassport(this)">Samie</div>
+    <div style="height:12px;"></div>
+    <button class="btn-secondary" style="width:100%;display:flex;align-items:center;justify-content:center;gap:8px;margin-bottom:8px;">📱 顯示 QR 碼</button>
+    <div id="passport-edit-actions" style="display:none;">
+      <div class="btn-row">
+        <button class="btn-edit" style="flex:1;justify-content:center;">✏️ 編輯</button>
+        <button class="btn-delete" style="flex:1;justify-content:center;">🗑 刪除</button>
+      </div>
+      <div style="height:8px;"></div>
+      <button class="btn-secondary" style="width:100%;display:flex;align-items:center;justify-content:center;gap:8px;">🔔 設定到期提醒</button>
     </div>
-    <div id="mypassport-container"></div>
-    <div class="spacer"></div>
   </div>
   <div class="tab-bar">
-    <button class="tab-item" onclick="go('s-home')"><svg viewBox="0 0 24 24"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>總覽</button>
-    <button class="tab-item" onclick="goFlight()"><svg viewBox="0 0 24 24"><path d="M21 16v-2l-8-5V3.5a1.5 1.5 0 0 0-3 0V9l-8 5v2l8-2.5V19l-2 1.5V22l3.5-1 3.5 1v-1.5L13 19v-5.5l8 2.5z"/></svg>機票</button>
-    <button class="tab-item" onclick="goHotel()"><svg viewBox="0 0 24 24"><path d="M2 20v-8a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v8"/><path d="M4 10V6a2 2 0 0 1 2-2h12a2 2 0 0 1 2 2v4"/><path d="M12 4v6"/><path d="M2 20h20"/></svg>住宿</button>
-    <button class="tab-item" onclick="goRestaurant()"><svg viewBox="0 0 24 24"><path d="M18 8h1a4 4 0 0 1 0 8h-1"/><path d="M2 8h16v9a4 4 0 0 1-4 4H6a4 4 0 0 1-4-4V8z"/><line x1="6" y1="1" x2="6" y2="4"/><line x1="10" y1="1" x2="10" y2="4"/><line x1="14" y1="1" x2="14" y2="4"/></svg>餐廳</button>
-    <button class="tab-item" onclick="goTimeline()"><svg viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>行程</button>
+    <button class="tab-item " onclick="go('s-home')"><svg viewBox="0 0 24 24"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>總覽</button>
+    <button class="tab-item " onclick="goFlight()"><svg viewBox="0 0 24 24"><path d="M21 16v-2l-8-5V3.5a1.5 1.5 0 0 0-3 0V9l-8 5v2l8-2.5V19l-2 1.5V22l3.5-1 3.5 1v-1.5L13 19v-5.5l8 2.5z"/></svg>機票</button>
+    <button class="tab-item " onclick="goHotel()"><svg viewBox="0 0 24 24"><path d="M2 20v-8a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v8"/><path d="M4 10V6a2 2 0 0 1 2-2h12a2 2 0 0 1 2 2v4"/><path d="M12 4v6"/><path d="M2 20h20"/></svg>住宿</button>
+    <button class="tab-item " onclick="goRestaurant()"><svg viewBox="0 0 24 24"><path d="M18 8h1a4 4 0 0 1 0 8h-1"/><path d="M2 8h16v9a4 4 0 0 1-4 4H6a4 4 0 0 1-4-4V8z"/><line x1="6" y1="1" x2="6" y2="4"/><line x1="10" y1="1" x2="10" y2="4"/><line x1="14" y1="1" x2="14" y2="4"/></svg>餐廳</button>
+    <button class="tab-item " onclick="goTimeline()"><svg viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>行程</button>
     <button class="tab-item active" onclick="goMyPassport()"><svg viewBox="0 0 24 24"><rect x="2" y="3" width="20" height="18" rx="2"/><path d="M8 10h.01M12 10h.01M16 10h.01M8 14h8"/></svg>護照</button>
-  </div>
-</div>
-
-<!-- 新增護照（總覽用，不綁旅程） -->
-<div class="screen" id="s-add-mypassport">
-  <div class="topbar">
-    <button class="icon-btn" onclick="go('s-mypassport')">✕</button>
-    <div class="topbar-title">新增護照</div>
-    <div></div>
-  </div>
-  <div class="content">
-    <div class="section-label" style="margin-top:0;">旅客</div>
-    <div class="person-row">
-      <div class="person-pill active" onclick="sp(this)">小米</div>
-      <div class="person-pill" onclick="sp(this)">馬哥</div>
-      <div class="person-pill" onclick="sp(this)">Samie</div>
-    </div>
-    <label class="form-label">護照號碼</label><input type="text" id="mp-no" placeholder="如：A123456789">
-    <label class="form-label">國籍</label><input type="text" id="mp-country" placeholder="如：中華民國">
-    <label class="form-label">核發日期</label><input type="date" id="mp-issue">
-    <label class="form-label">到期日期</label><input type="date" id="mp-expiry">
-    <label class="form-label">備注</label><input type="text" id="mp-note" placeholder="備注">
-    <div class="btn-row" style="margin-top:16px;">
-      <button class="btn-secondary" onclick="go('s-mypassport')" style="flex:1;">取消</button>
-      <button class="btn-primary" onclick="saveMyPassport()" style="flex:1;">儲存</button>
-    </div>
-    <div class="spacer"></div>
   </div>
 </div>
 
@@ -531,7 +496,6 @@ textarea{resize:none;}
     <label class="form-label">目的地</label><input type="text" placeholder="如：日本・大阪">
     <label class="form-label">出發 / 返回日期</label>
     <div class="grid-2"><input type="date"><input type="date"></div>
-    <div class="section-label">旅客</div>
     <div class="section-label">旅客（點選參加的人）</div>
     <div class="card clickable" id="traveler-mimi" onclick="toggleTraveler(this)" style="margin-bottom:8px;border:2px solid #1a1a1a;">
       <div class="card-row"><div style="width:32px;height:32px;border-radius:50%;background:#e3f2fd;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:600;color:#1565c0;">小米</div><div style="font-size:13px;font-weight:600;">許書綺（小米）</div><div style="margin-left:auto;font-size:18px;" id="check-mimi">✓</div></div>
@@ -667,7 +631,6 @@ function applyMode() {
   show('restaurant-add-btn', isAdmin);
   show('settings-btn', isAdmin);
   show('timeline-add-btn', isAdmin);
-  show('mypassport-add-btn', isAdmin);
 }
 
 function doLogin() {
@@ -745,7 +708,7 @@ async function loadTrips() {
       const bg = isPast ? '#555' : '#1a1a1a';
       const badge = isPast ? '已完成' : '即將出發';
       const travelers = row[5] || '小米,馬哥,Samie';
-      
+
       const card = `<div class="trip-card" onclick="selectTrip('${id}','${name.replace(/'/g,"\\'")}','${travelers}')">
         <div class="trip-header" style="background:${bg};">
           <div class="trip-name">${name}</div>
@@ -764,12 +727,7 @@ async function loadTrips() {
     
     let html = '';
     if(upcomingCount > 0) html += '<div class="section-label" style="margin-top:0;">即將到來</div>' + upcomingHTML;
-    if(pastCount > 0) html += `
-      <div class="section-label" style="cursor:pointer;display:flex;align-items:center;justify-content:space-between;" onclick="togglePastTrips(this)">
-        <span>過去旅程（${pastCount}）</span>
-        <span id="past-trips-arrow">▾</span>
-      </div>
-      <div id="past-trips-container" style="display:none;">${pastHTML}</div>`;
+    if(pastCount > 0) html += `<div class="section-label" style="cursor:pointer;display:flex;align-items:center;justify-content:space-between;" onclick="togglePastTrips(this)"><span>過去旅程（${pastCount}）</span><span id="past-trips-arrow">▾</span></div><div id="past-trips-container" style="display:none;">${pastHTML}</div>`;
     if(upcomingCount === 0 && pastCount === 0) html = '<div style="text-align:center;padding:48px 20px;color:#ccc;"><div style="font-size:48px;margin-bottom:12px;">🗺️</div><p style="font-size:14px;">還沒有旅程<br>按「＋ 新旅程」開始吧！</p></div>';
     container.innerHTML = html;
     
@@ -779,21 +737,10 @@ async function loadTrips() {
   }
 }
 
-function selectTrip(id, name, travelers) {
+function selectTrip(id, name) {
   currentTripId = id;
   currentTripName = name;
   document.querySelector('#s-detail .topbar-title').textContent = name;
-  
-  // Update person pills in detail screen based on travelers
-  const travelerList = travelers ? travelers.split(',') : ['小米','馬哥','Samie'];
-  const allPersons = ['小米','馬哥','Samie'];
-  const detailPersonRow = document.querySelector('#s-detail .person-row');
-  if(detailPersonRow) {
-    detailPersonRow.innerHTML = travelerList.map((p,i) => 
-      `<div class="person-pill ${i===0?'active':''}" onclick="sp(this)">${p}</div>`
-    ).join('');
-  }
-  
   go('s-detail');
   loadTripDetail();
 }
@@ -966,56 +913,6 @@ async function loadTripDetail() {
   }
 }
 
-function togglePastTrips(el) {
-  const container = document.getElementById('past-trips-container');
-  const arrow = document.getElementById('past-trips-arrow');
-  if(!container) return;
-  const isHidden = container.style.display === 'none';
-  container.style.display = isHidden ? '' : 'none';
-  if(arrow) arrow.textContent = isHidden ? '▴' : '▾';
-}
-
-function addExtraTraveler() {
-  const input = document.getElementById('extra-traveler-input');
-  const name = input.value.trim();
-  if(!name) return;
-  
-  const container = document.getElementById('extra-travelers');
-  const id = 'extra-' + Date.now();
-  const initials = name.slice(0,2);
-  const colors = ['#f3e5f5','#fce4ec','#e8f5e9','#fff8e1','#e3f2fd'];
-  const textColors = ['#6a1b9a','#c62828','#2e7d32','#e65100','#1565c0'];
-  const ci = container.children.length % 5;
-  
-  container.insertAdjacentHTML('beforeend', `
-    <div class="card" id="${id}" style="margin-bottom:8px;border:2px solid #1a1a1a;">
-      <div class="card-row">
-        <div style="width:32px;height:32px;border-radius:50%;background:${colors[ci]};display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:600;color:${textColors[ci]};">${initials}</div>
-        <div style="font-size:13px;font-weight:600;">${name}</div>
-        <button onclick="document.getElementById('${id}').remove()" style="margin-left:auto;background:none;border:none;cursor:pointer;color:#ccc;font-size:18px;">✕</button>
-      </div>
-    </div>
-  `);
-  input.value = '';
-}
-
-function toggleTraveler(el) {
-  const isSelected = el.style.border === '2px solid rgb(26, 26, 26)';
-  if(isSelected) {
-    el.style.border = '0.5px solid #e5e5e5';
-    el.style.opacity = '0.4';
-    const checkId = 'check-' + el.id.replace('traveler-', '');
-    const check = document.getElementById(checkId);
-    if(check) check.textContent = '';
-  } else {
-    el.style.border = '2px solid #1a1a1a';
-    el.style.opacity = '1';
-    const checkId = 'check-' + el.id.replace('traveler-', '');
-    const check = document.getElementById(checkId);
-    if(check) check.textContent = '✓';
-  }
-}
-
 async function saveTrip() {
   const inputs = document.querySelectorAll('#s-new-trip input');
   const name = inputs[0].value;
@@ -1023,22 +920,8 @@ async function saveTrip() {
   const start = inputs[2].value;
   const end = inputs[3].value;
   if(!name){ alert('請填寫旅程名稱'); return; }
-  
-  const travelers = [];
-  if(document.getElementById('check-mimi')?.textContent === '✓') travelers.push('小米');
-  if(document.getElementById('check-mage')?.textContent === '✓') travelers.push('馬哥');
-  if(document.getElementById('check-samie')?.textContent === '✓') travelers.push('Samie');
-  
-  // collect extra travelers
-  document.querySelectorAll('#extra-travelers .card').forEach(card => {
-    const nameEl = card.querySelector('div[style*="font-weight:600"]');
-    if(nameEl) travelers.push(nameEl.textContent.trim());
-  });
-  
-  if(travelers.length === 0) { alert('請至少選擇一位旅客'); return; }
-  
   const id = Date.now();
-  const ok = await saveToSheet('旅程', [id, name, dest, start, end, travelers.join(',')]);
+  const ok = await saveToSheet('旅程', [id, name, dest, start, end]);
   if(ok){ clearCache(); alert('旅程建立成功！'); go('s-home'); loadTrips(); }
 }
 
@@ -1060,7 +943,7 @@ async function saveFlight() {
   const pnr = inputs[11]?.value || '';
   if(!flight){ alert('請填寫航班號'); return; }
   const id = Date.now();
-  const ok = await saveToSheet('機票', [id, currentTripId, person, flight, ticketNo, depAirport, depTime, arrAirport, arrTime, twTime, duration, terminal, seat, cabin, price, pnr]);
+  const ok = await saveToSheet('機票', [id, 1, person, flight, ticketNo, depAirport, depTime, arrAirport, arrTime, twTime, duration, terminal, seat, cabin, price, pnr]);
   if(ok){ clearCache(); alert('機票新增成功！'); go('s-flight'); loadFlights(); }
 }
 
@@ -1079,7 +962,7 @@ async function saveHotel() {
   const gymOn = document.getElementById('gym-toggle')?.classList.contains('on');
   if(!hotelName){ alert('請填寫飯店名稱'); return; }
   const id = Date.now();
-  const ok = await saveToSheet('住宿', [id, currentTripId, hotelName, address, phone, checkin, checkout, confirmCode, roomType, price, cancel, poolOn?'有':'無', '', '', gymOn?'有':'無', '', '']);
+  const ok = await saveToSheet('住宿', [id, 1, hotelName, address, phone, checkin, checkout, confirmCode, roomType, price, cancel, poolOn?'有':'無', '', '', gymOn?'有':'無', '', '']);
   if(ok){ clearCache(); alert('住宿新增成功！'); goHotel(); }
 }
 
@@ -1423,8 +1306,270 @@ function openMap(address) {
   window.open(url, '_blank');
 }
 
-// 修改密碼
-function changePassword() {
+// 旅客切換功能
+function toggleTraveler(el) {
+  const isSelected = el.style.border === '2px solid rgb(26, 26, 26)';
+  if(isSelected) {
+    el.style.border = '0.5px solid #e5e5e5';
+    el.style.opacity = '0.4';
+    const checkId = 'check-' + el.id.replace('traveler-', '');
+    const check = document.getElementById(checkId);
+    if(check) check.textContent = '';
+  } else {
+    el.style.border = '2px solid #1a1a1a';
+    el.style.opacity = '1';
+    const checkId = 'check-' + el.id.replace('traveler-', '');
+    const check = document.getElementById(checkId);
+    if(check) check.textContent = '✓';
+  }
+}
+
+function addExtraTraveler() {
+  const input = document.getElementById('extra-traveler-input');
+  const name = input.value.trim();
+  if(!name) return;
+  const container = document.getElementById('extra-travelers');
+  const id = 'extra-' + Date.now();
+  const initials = name.slice(0,2);
+  const colors = ['#f3e5f5','#fce4ec','#e8f5e9','#fff8e1','#e3f2fd'];
+  const textColors = ['#6a1b9a','#c62828','#2e7d32','#e65100','#1565c0'];
+  const ci = container.children.length % 5;
+  container.insertAdjacentHTML('beforeend', `
+    <div class="card" id="${id}" style="margin-bottom:8px;border:2px solid #1a1a1a;">
+      <div class="card-row">
+        <div style="width:32px;height:32px;border-radius:50%;background:${colors[ci]};display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:600;color:${textColors[ci]};">${initials}</div>
+        <div style="font-size:13px;font-weight:600;">${name}</div>
+        <button onclick="document.getElementById('${id}').remove()" style="margin-left:auto;background:none;border:none;cursor:pointer;color:#ccc;font-size:18px;">✕</button>
+      </div>
+    </div>
+  `);
+  input.value = '';
+}
+
+async function saveTrip() {
+  const inputs = document.querySelectorAll('#s-new-trip input');
+  const name = inputs[0].value;
+  const dest = inputs[1].value;
+  const start = inputs[2].value;
+  const end = inputs[3].value;
+  if(!name){ alert('請填寫旅程名稱'); return; }
+  const travelers = [];
+  if(document.getElementById('check-mimi')?.textContent === '✓') travelers.push('小米');
+  if(document.getElementById('check-mage')?.textContent === '✓') travelers.push('馬哥');
+  if(document.getElementById('check-samie')?.textContent === '✓') travelers.push('Samie');
+  document.querySelectorAll('#extra-travelers .card').forEach(card => {
+    const nameEl = card.querySelector('div[style*="font-weight:600"]');
+    if(nameEl) travelers.push(nameEl.textContent.trim());
+  });
+  if(travelers.length === 0) { alert('請至少選擇一位旅客'); return; }
+  const id = Date.now();
+  const ok = await saveToSheet('旅程', [id, name, dest, start, end, travelers.join(',')]);
+  if(ok){ clearCache(); alert('旅程建立成功！'); go('s-home'); loadTrips(); }
+}
+
+function selectTrip(id, name, travelers) {
+  currentTripId = id;
+  currentTripName = name;
+  document.querySelector('#s-detail .topbar-title').textContent = name;
+  const travelerList = travelers ? travelers.split(',') : ['小米','馬哥','Samie'];
+  const detailPersonRow = document.querySelector('#s-detail .person-row');
+  if(detailPersonRow) {
+    detailPersonRow.innerHTML = travelerList.map((p,i) =>
+      `<div class="person-pill ${i===0?'active':''}" onclick="sp(this)">${p}</div>`
+    ).join('');
+  }
+  go('s-detail');
+  loadTripDetail();
+}
+
+function togglePastTrips(el) {
+  const container = document.getElementById('past-trips-container');
+  const arrow = document.getElementById('past-trips-arrow');
+  if(!container) return;
+  const isHidden = container.style.display === 'none';
+  container.style.display = isHidden ? '' : 'none';
+  if(arrow) arrow.textContent = isHidden ? '▴' : '▾';
+}
+
+// 簽證到期提醒
+async function checkPassportExpiry() {
+  try {
+    const rows = await loadFromSheet('簽證護照');
+    const today = new Date();
+    const warnings = [];
+    rows.slice(1).forEach(p => {
+      if(!p[8]) return;
+      const expiry = new Date(p[8]);
+      const daysLeft = Math.floor((expiry - today) / (1000*60*60*24));
+      if(daysLeft >= 0 && daysLeft <= 180) {
+        const person = p[2] || '';
+        const type = p[3] || '文件';
+        const country = p[4] || '';
+        warnings.push(`⚠️ ${person} 的${country}${type}將在 ${daysLeft} 天後到期（${p[8]}）`);
+      }
+    });
+    if(warnings.length > 0) {
+      setTimeout(() => alert('【簽證／護照到期提醒】\n\n' + warnings.join('\n')), 800);
+    }
+  } catch(e) {}
+}
+
+// 護照總覽
+function goMyPassport() {
+  go('s-mypassport');
+  show('mypassport-add-btn', isAdmin);
+  loadMyPassports();
+}
+
+function spMyPassport(el) {
+  el.closest('.person-row').querySelectorAll('.person-pill').forEach(p => p.classList.remove('active'));
+  el.classList.add('active');
+  loadMyPassports();
+}
+
+async function loadMyPassports() {
+  const container = document.getElementById('mypassport-container');
+  if(!container) return;
+  const activePerson = document.querySelector('#s-mypassport .person-pill.active')?.textContent || '小米';
+  container.innerHTML = '<div style="text-align:center;padding:24px;color:#999;font-size:13px;">載入中...</div>';
+  try {
+    const rows = await loadFromSheet('護照');
+    const items = rows.slice(1).filter(r => r[1] === activePerson);
+    if(items.length === 0) {
+      container.innerHTML = '<div style="text-align:center;padding:40px 20px;color:#ccc;"><div style="font-size:40px;margin-bottom:10px;">🛂</div><p style="font-size:13px;">尚未新增護照資料</p></div>';
+      return;
+    }
+    const today = new Date();
+    let html = '';
+    items.forEach(p => {
+      const expiry = p[4] ? new Date(p[4]) : null;
+      const daysLeft = expiry ? Math.floor((expiry - today) / (1000*60*60*24)) : null;
+      const warn = daysLeft !== null && daysLeft < 365;
+      const urgent = daysLeft !== null && daysLeft < 90;
+      html += `<div style="background:#1a1a1a;border-radius:12px;padding:16px;margin-bottom:10px;color:white;">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;">
+          <div style="font-size:16px;font-weight:600;">🛂 ${p[1]||''} 的護照</div>
+          <span style="font-size:11px;opacity:0.6;">${p[2]||''}</span>
+        </div>
+        <div style="display:flex;justify-content:space-between;">
+          ${p[3] ? '<div><div style="font-size:10px;opacity:0.6;">護照號碼</div><div style="font-size:14px;font-weight:600;margin-top:2px;letter-spacing:1px;">'+p[3]+'</div></div>' : ''}
+          ${p[4] ? '<div style="text-align:right;"><div style="font-size:10px;opacity:0.6;">有效期限</div><div style="font-size:13px;font-weight:500;margin-top:2px;">'+p[4]+'</div></div>' : ''}
+        </div>
+        ${daysLeft !== null ? '<div style="margin-top:10px;font-size:11px;opacity:0.6;">剩餘 '+daysLeft+' 天</div>' : ''}
+      </div>
+      ${urgent ? '<div class="warn-box" style="background:#ffebee;color:#c62828;">🚨 護照即將到期（剩 '+daysLeft+' 天），請盡快更新！</div>' : warn ? '<div class="warn-box">⚠️ 護照將在 '+daysLeft+' 天後到期，請注意更新</div>' : ''}`;
+    });
+    container.innerHTML = html;
+  } catch(e) {
+    container.innerHTML = '<div style="text-align:center;padding:24px;color:#999;font-size:13px;">載入失敗</div>';
+  }
+}
+
+async function saveMyPassport() {
+  const person = document.querySelector('#s-add-mypassport .person-pill.active')?.textContent || '';
+  const no = document.getElementById('mp-no')?.value || '';
+  const country = document.getElementById('mp-country')?.value || '';
+  const issue = document.getElementById('mp-issue')?.value || '';
+  const expiry = document.getElementById('mp-expiry')?.value || '';
+  const note = document.getElementById('mp-note')?.value || '';
+  if(!person) { alert('請選擇旅客'); return; }
+  if(!no) { alert('請填寫護照號碼'); return; }
+  const id = Date.now();
+  const ok = await saveToSheet('護照', [id, person, country, no, expiry, issue, note]);
+  if(ok) { clearCache(); alert('護照新增成功！'); goMyPassport(); }
+}
+
+// Google 行事曆
+async function sendToCalendar() {
+  if(!currentTripId) { alert('請先選擇旅程'); return; }
+  try {
+    const [flights, hotels, tickets, restaurants] = await Promise.all([
+      loadFromSheet('機票'), loadFromSheet('住宿'), loadFromSheet('票券'), loadFromSheet('餐廳')
+    ]);
+    let calLinks = [];
+    flights.slice(1).filter(r => String(r[1]) === String(currentTripId)).forEach(f => {
+      if(f[6]) {
+        const title = encodeURIComponent((f[3]||'') + ' ' + (f[5]||'') + ' → ' + (f[7]||''));
+        const details = encodeURIComponent('機票號碼：' + (f[4]||'') + '\n訂位代號：' + (f[15]||'') + '\n座位：' + (f[12]||''));
+        calLinks.push(`https://calendar.google.com/calendar/render?action=TEMPLATE&text=${title}&dates=${formatCalDate(f[6])}/${formatCalDate(f[8]||f[6])}&details=${details}`);
+      }
+    });
+    hotels.slice(1).filter(r => String(r[1]) === String(currentTripId)).forEach(h => {
+      if(h[5]) {
+        const title = encodeURIComponent('🏨 ' + (h[2]||'飯店') + ' Check-in');
+        const details = encodeURIComponent('確認碼：' + (h[7]||'') + '\n房型：' + (h[8]||''));
+        calLinks.push(`https://calendar.google.com/calendar/render?action=TEMPLATE&text=${title}&dates=${formatCalDate(h[5])}/${formatCalDate(h[6]||h[5])}&details=${details}&location=${encodeURIComponent(h[3]||'')}`);
+      }
+    });
+    restaurants.slice(1).filter(r => String(r[1]) === String(currentTripId)).forEach(r => {
+      if(r[4]) {
+        const title = encodeURIComponent('🍽️ ' + (r[2]||'餐廳'));
+        calLinks.push(`https://calendar.google.com/calendar/render?action=TEMPLATE&text=${title}&dates=${formatCalDate(r[4])}/${formatCalDateOffset(r[4],2)}&location=${encodeURIComponent(r[3]||'')}`);
+      }
+    });
+    tickets.slice(1).filter(r => String(r[1]) === String(currentTripId)).forEach(t => {
+      if(t[6]) {
+        const title = encodeURIComponent('🎫 ' + (t[3]||'票券'));
+        calLinks.push(`https://calendar.google.com/calendar/render?action=TEMPLATE&text=${title}&dates=${formatCalDate(t[6])}/${formatCalDateOffset(t[6],3)}&location=${encodeURIComponent(t[5]||'')}`);
+      }
+    });
+    if(calLinks.length === 0) { alert('這個旅程還沒有行程資料可以新增到行事曆'); return; }
+    showCalendarModal(calLinks);
+  } catch(e) { alert('載入行程資料失敗，請重試'); }
+}
+
+function formatCalDate(str) {
+  if(!str) return '';
+  const d = new Date(str);
+  if(isNaN(d)) return '';
+  const pad = n => String(n).padStart(2,'0');
+  return d.getFullYear()+pad(d.getMonth()+1)+pad(d.getDate())+'T'+pad(d.getHours())+pad(d.getMinutes())+'00';
+}
+
+function formatCalDateOffset(str, hours) {
+  const d = new Date(str);
+  if(isNaN(d)) return formatCalDate(str);
+  d.setHours(d.getHours() + hours);
+  const pad = n => String(n).padStart(2,'0');
+  return d.getFullYear()+pad(d.getMonth()+1)+pad(d.getDate())+'T'+pad(d.getHours())+pad(d.getMinutes())+'00';
+}
+
+function showCalendarModal(links) {
+  const labels = links.map((l,i) => { const m = decodeURIComponent(l).match(/text=([^&]+)/); return m ? m[1] : '行程'+(i+1); });
+  let html = `<div id="cal-modal" style="position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,0.5);z-index:999;display:flex;align-items:flex-end;">
+    <div style="background:#fff;border-radius:20px 20px 0 0;padding:24px;width:100%;max-height:70vh;overflow-y:auto;">
+      <div style="font-size:16px;font-weight:600;margin-bottom:4px;">📅 新增到 Google 行事曆</div>
+      <div style="font-size:12px;color:#999;margin-bottom:16px;">點選各行程分別新增</div>`;
+  labels.forEach((label,i) => {
+    const icon = label.startsWith('🏨')?'🏨':label.startsWith('🍽')?'🍽️':label.startsWith('🎫')?'🎫':'✈️';
+    html += `<a href="${links[i]}" target="_blank" style="display:flex;align-items:center;gap:10px;padding:12px;border:0.5px solid #e5e5e5;border-radius:10px;margin-bottom:8px;text-decoration:none;color:#1a1a1a;"><div style="font-size:20px;">${icon}</div><div style="font-size:13px;font-weight:500;">${label}</div><div style="margin-left:auto;font-size:12px;color:#1a73e8;">新增 ›</div></a>`;
+  });
+  html += `<button onclick="document.getElementById('cal-modal').remove()" style="width:100%;padding:12px;margin-top:8px;border:0.5px solid #e5e5e5;border-radius:10px;background:none;font-size:14px;color:#666;cursor:pointer;">關閉</button></div></div>`;
+  document.body.insertAdjacentHTML('beforeend', html);
+}
+
+// ⚙️ 設定按鈕（管理員才看到）
+function applyMode() {
+  const badge = document.getElementById('home-badge');
+  if(isAdmin) { badge.textContent = '管理員'; badge.className = 'mode-badge mode-admin'; }
+  else { badge.textContent = '查看模式'; badge.className = 'mode-badge mode-view'; }
+  show('new-trip-btn', isAdmin);
+  show('detail-edit-btn', isAdmin);
+  show('detail-admin-actions', isAdmin);
+  show('flight-add-btn', isAdmin);
+  show('flight-edit-actions', isAdmin);
+  show('hotel-add-btn', isAdmin);
+  show('hotel-edit-actions', isAdmin);
+  show('ticket-add-btn', isAdmin);
+  show('ticket-edit-actions', isAdmin);
+  show('passport-add-btn', isAdmin);
+  show('passport-edit-actions', isAdmin);
+  show('restaurant-add-btn', isAdmin);
+  show('settings-btn', isAdmin);
+  show('timeline-add-btn', isAdmin);
+  show('mypassport-add-btn', isAdmin);
+}
+
   const adminPwd = document.getElementById('new-admin-pwd').value;
   const viewPwd = document.getElementById('new-view-pwd').value;
   const confirmPwd = document.getElementById('confirm-view-pwd').value;
@@ -1478,7 +1623,7 @@ var ocrTargetScreen = 's-add-flight';
 var ocrData = {};
 
 function triggerOCR(type) {
-  ocrTargetScreen = type === 'flight' ? 's-add-flight' : type === 'hotel' ? 's-add-hotel' : type === 'ticket' ? 's-add-ticket' : type === 'restaurant' ? 's-add-restaurant' : 's-add-flight';
+  ocrTargetScreen = type === 'flight' ? 's-add-flight' : type === 'hotel' ? 's-add-hotel' : type === 'ticket' ? 's-add-ticket' : 's-add-flight';
   document.getElementById('ocr-back-btn').onclick = () => go(ocrTargetScreen);
   document.getElementById('ocr-result').style.display = 'none';
   document.getElementById('ocr-preview').style.display = 'none';
@@ -1569,9 +1714,6 @@ function applyOCR() {
     if(ocrData.ticket_name) document.getElementById('ticket-name').value = ocrData.ticket_name;
     if(ocrData.address) document.getElementById('ticket-address').value = ocrData.address;
     if(ocrData.price) document.getElementById('ticket-price').value = ocrData.price;
-  } else if(ocrTargetScreen === 's-add-restaurant') {
-    applyOCRRestaurant();
-    return;
   }
   go(ocrTargetScreen);
   alert('資料已套用！請確認並補充其他欄位');
@@ -1585,231 +1727,7 @@ document.addEventListener('DOMContentLoaded', () => {
   if(hotelOcr) hotelOcr.onclick = () => triggerOCR('hotel');
   const ticketOcr = document.querySelector('#s-add-ticket .ocr-zone');
   if(ticketOcr) ticketOcr.onclick = () => triggerOCR('ticket');
-  const restOcr = document.querySelector('#s-add-restaurant .ocr-zone');
-  if(restOcr) restOcr.onclick = () => triggerOCR('restaurant');
 });
-
-// goTicket function
-function goTicket() {
-  go('s-ticket');
-  loadTickets();
-}
-
-// 簽證到期提醒 - 登入後檢查
-async function checkPassportExpiry() {
-  try {
-    const rows = await loadFromSheet('簽證護照');
-    const today = new Date();
-    const warnings = [];
-    rows.slice(1).forEach(p => {
-      if(!p[8]) return;
-      const expiry = new Date(p[8]);
-      const daysLeft = Math.floor((expiry - today) / (1000*60*60*24));
-      if(daysLeft >= 0 && daysLeft <= 180) {
-        const person = p[2] || '';
-        const type = p[3] || '文件';
-        const country = p[4] || '';
-        warnings.push(`⚠️ ${person} 的${country}${type}將在 ${daysLeft} 天後到期（${p[8]}）`);
-      }
-    });
-    if(warnings.length > 0) {
-      setTimeout(() => alert('【簽證／護照到期提醒】\n\n' + warnings.join('\n')), 800);
-    }
-  } catch(e) {}
-}
-
-// Google 行事曆連動
-async function sendToCalendar() {
-  if(!currentTripId) { alert('請先選擇旅程'); return; }
-  
-  try {
-    const [flights, hotels, tickets, restaurants] = await Promise.all([
-      loadFromSheet('機票'),
-      loadFromSheet('住宿'),
-      loadFromSheet('票券'),
-      loadFromSheet('餐廳')
-    ]);
-    
-    let calLinks = [];
-    
-    // 機票
-    flights.slice(1).filter(r => String(r[1]) === String(currentTripId)).forEach(f => {
-      if(f[6]) {
-        const title = encodeURIComponent((f[3]||'') + ' ' + (f[5]||'') + ' → ' + (f[7]||''));
-        const details = encodeURIComponent('機票號碼：' + (f[4]||'') + '\n訂位代號：' + (f[15]||'') + '\n座位：' + (f[12]||'') + '\n航廈：' + (f[11]||''));
-        // Format: YYYYMMDDTHHMMSS
-        const dep = formatCalDate(f[6]);
-        const arr = formatCalDate(f[8] || f[6]);
-        calLinks.push(`https://calendar.google.com/calendar/render?action=TEMPLATE&text=${title}&dates=${dep}/${arr}&details=${details}`);
-      }
-    });
-    
-    // 飯店
-    hotels.slice(1).filter(r => String(r[1]) === String(currentTripId)).forEach(h => {
-      if(h[5]) {
-        const title = encodeURIComponent('🏨 ' + (h[2]||'飯店') + ' Check-in');
-        const loc = encodeURIComponent(h[3]||'');
-        const details = encodeURIComponent('確認碼：' + (h[7]||'') + '\n房型：' + (h[8]||'') + '\n金額：' + (h[9]||''));
-        const dep = formatCalDate(h[5]);
-        const arr = formatCalDate(h[6] || h[5]);
-        calLinks.push(`https://calendar.google.com/calendar/render?action=TEMPLATE&text=${title}&dates=${dep}/${arr}&details=${details}&location=${loc}`);
-      }
-    });
-    
-    // 餐廳
-    restaurants.slice(1).filter(r => String(r[1]) === String(currentTripId)).forEach(r => {
-      if(r[4]) {
-        const title = encodeURIComponent('🍽️ ' + (r[2]||'餐廳'));
-        const loc = encodeURIComponent(r[3]||'');
-        const details = encodeURIComponent('確認碼：' + (r[7]||'') + '\n人數：' + (r[6]||'') + '\n台灣時間：' + (r[5]||''));
-        const dep = formatCalDate(r[4]);
-        const end = formatCalDateOffset(r[4], 2);
-        calLinks.push(`https://calendar.google.com/calendar/render?action=TEMPLATE&text=${title}&dates=${dep}/${end}&details=${details}&location=${loc}`);
-      }
-    });
-    
-    // 票券
-    tickets.slice(1).filter(r => String(r[1]) === String(currentTripId)).forEach(t => {
-      if(t[6]) {
-        const title = encodeURIComponent('🎫 ' + (t[3]||'票券'));
-        const loc = encodeURIComponent(t[5]||'');
-        const details = encodeURIComponent('票券號碼：' + (t[8]||'') + '\n台灣時間：' + (t[7]||''));
-        const dep = formatCalDate(t[6]);
-        const end = formatCalDateOffset(t[6], 3);
-        calLinks.push(`https://calendar.google.com/calendar/render?action=TEMPLATE&text=${title}&dates=${dep}/${end}&details=${details}&location=${loc}`);
-      }
-    });
-    
-    if(calLinks.length === 0) { alert('這個旅程還沒有行程資料可以新增到行事曆'); return; }
-    
-    // Show calendar modal
-    showCalendarModal(calLinks);
-    
-  } catch(e) {
-    alert('載入行程資料失敗，請重試');
-  }
-}
-
-function formatCalDate(str) {
-  if(!str) return '';
-  // Try to parse datetime-local format: 2025-05-07T14:30 → 20250507T143000
-  const d = new Date(str);
-  if(isNaN(d)) {
-    // Try plain date
-    const parts = str.split(/[-/]/);
-    if(parts.length >= 3) return parts[0]+parts[1].padStart(2,'0')+parts[2].padStart(2,'0')+'T000000';
-    return '';
-  }
-  const pad = n => String(n).padStart(2,'0');
-  return d.getFullYear()+pad(d.getMonth()+1)+pad(d.getDate())+'T'+pad(d.getHours())+pad(d.getMinutes())+'00';
-}
-
-function formatCalDateOffset(str, hours) {
-  const d = new Date(str);
-  if(isNaN(d)) return formatCalDate(str);
-  d.setHours(d.getHours() + hours);
-  const pad = n => String(n).padStart(2,'0');
-  return d.getFullYear()+pad(d.getMonth()+1)+pad(d.getDate())+'T'+pad(d.getHours())+pad(d.getMinutes())+'00';
-}
-
-function showCalendarModal(links) {
-  const labels = links.map((l, i) => {
-    const m = decodeURIComponent(l).match(/text=([^&]+)/);
-    return m ? m[1] : '行程 ' + (i+1);
-  });
-  
-  let html = `<div id="cal-modal" style="position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,0.5);z-index:999;display:flex;align-items:flex-end;">
-    <div style="background:#fff;border-radius:20px 20px 0 0;padding:24px;width:100%;max-height:70vh;overflow-y:auto;">
-      <div style="font-size:16px;font-weight:600;margin-bottom:4px;">📅 新增到 Google 行事曆</div>
-      <div style="font-size:12px;color:#999;margin-bottom:16px;">點選各行程分別新增</div>`;
-  
-  labels.forEach((label, i) => {
-    html += `<a href="${links[i]}" target="_blank" style="display:flex;align-items:center;gap:10px;padding:12px;border:0.5px solid #e5e5e5;border-radius:10px;margin-bottom:8px;text-decoration:none;color:#1a1a1a;">
-      <div style="font-size:20px;">${label.startsWith('🏨')?'🏨':label.startsWith('🍽')?'🍽️':label.startsWith('🎫')?'🎫':'✈️'}</div>
-      <div style="font-size:13px;font-weight:500;">${label}</div>
-      <div style="margin-left:auto;font-size:12px;color:#1a73e8;">新增 ›</div>
-    </a>`;
-  });
-  
-  html += `<button onclick="document.getElementById('cal-modal').remove()" style="width:100%;padding:12px;margin-top:8px;border:0.5px solid #e5e5e5;border-radius:10px;background:none;font-size:14px;color:#666;cursor:pointer;">關閉</button>
-    </div></div>`;
-  
-  document.body.insertAdjacentHTML('beforeend', html);
-}
-
-// 護照總覽（不過濾旅程）
-function goMyPassport() {
-  go('s-mypassport');
-  show('mypassport-add-btn', isAdmin);
-  loadMyPassports();
-}
-
-function spMyPassport(el) {
-  el.closest('.person-row').querySelectorAll('.person-pill').forEach(p => p.classList.remove('active'));
-  el.classList.add('active');
-  loadMyPassports();
-}
-
-async function loadMyPassports() {
-  const container = document.getElementById('mypassport-container');
-  if(!container) return;
-  const activePerson = document.querySelector('#s-mypassport .person-pill.active')?.textContent || '小米';
-  container.innerHTML = '<div style="text-align:center;padding:24px;color:#999;font-size:13px;">載入中...</div>';
-  try {
-    const rows = await loadFromSheet('護照');
-    const items = rows.slice(1).filter(r => r[1] === activePerson);
-    if(items.length === 0) {
-      container.innerHTML = '<div style="text-align:center;padding:40px 20px;color:#ccc;"><div style="font-size:40px;margin-bottom:10px;">🛂</div><p style="font-size:13px;">尚未新增護照資料</p></div>';
-      return;
-    }
-    const today = new Date();
-    let html = '';
-    items.forEach(p => {
-      const expiry = p[4] ? new Date(p[4]) : null;
-      const daysLeft = expiry ? Math.floor((expiry - today) / (1000*60*60*24)) : null;
-      const warn = daysLeft !== null && daysLeft < 365;
-      const urgent = daysLeft !== null && daysLeft < 90;
-      html += `<div style="background:#1a1a1a;border-radius:12px;padding:16px;margin-bottom:10px;color:white;">
-        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;">
-          <div style="font-size:16px;font-weight:600;">🛂 ${p[1]||''} 的護照</div>
-          <span style="font-size:11px;opacity:0.6;">${p[2]||''}</span>
-        </div>
-        <div style="display:flex;justify-content:space-between;">
-          ${p[3] ? '<div><div style="font-size:10px;opacity:0.6;">護照號碼</div><div style="font-size:14px;font-weight:600;margin-top:2px;letter-spacing:1px;">'+p[3]+'</div></div>' : ''}
-          ${p[4] ? '<div style="text-align:right;"><div style="font-size:10px;opacity:0.6;">有效期限</div><div style="font-size:13px;font-weight:500;margin-top:2px;">'+p[4]+'</div></div>' : ''}
-        </div>
-        ${daysLeft !== null ? '<div style="margin-top:10px;font-size:11px;opacity:0.6;">剩餘 '+daysLeft+' 天</div>' : ''}
-      </div>
-      ${urgent ? '<div class="warn-box" style="background:#ffebee;color:#c62828;">🚨 護照即將到期（剩 '+daysLeft+' 天），請盡快更新！</div>' : warn ? '<div class="warn-box">⚠️ 護照將在 '+daysLeft+' 天後到期，請注意更新</div>' : ''}`;
-    });
-    container.innerHTML = html;
-  } catch(e) {
-    container.innerHTML = '<div style="text-align:center;padding:24px;color:#999;font-size:13px;">載入失敗</div>';
-  }
-}
-
-async function saveMyPassport() {
-  const person = document.querySelector('#s-add-mypassport .person-pill.active')?.textContent || '';
-  const no = document.getElementById('mp-no')?.value || '';
-  const country = document.getElementById('mp-country')?.value || '';
-  const issue = document.getElementById('mp-issue')?.value || '';
-  const expiry = document.getElementById('mp-expiry')?.value || '';
-  const note = document.getElementById('mp-note')?.value || '';
-  if(!person) { alert('請選擇旅客'); return; }
-  if(!no) { alert('請填寫護照號碼'); return; }
-  const id = Date.now();
-  const ok = await saveToSheet('護照', [id, person, country, no, expiry, issue, note]);
-  if(ok) { clearCache(); alert('護照新增成功！'); goMyPassport(); }
-}
-
-// OCR for restaurant
-function applyOCRRestaurant() {
-  if(ocrData.hotel_name) document.querySelector('#s-add-restaurant input').value = ocrData.hotel_name;
-  if(ocrData.address) document.querySelectorAll('#s-add-restaurant input')[1].value = ocrData.address;
-  if(ocrData.confirm_code) document.querySelectorAll('#s-add-restaurant input')[5].value = ocrData.confirm_code;
-  go('s-add-restaurant');
-  alert('資料已套用！請確認並補充其他欄位');
-}
 </script>
 
 <!-- 新增餐廳 -->
@@ -1985,5 +1903,57 @@ function applyOCRRestaurant() {
     </div>
   </div>
 </div>
+<!-- 護照總覽（底部tab） -->
+<div class="screen" id="s-mypassport">
+  <div class="topbar">
+    <div class="topbar-title">🛂 護照資料</div>
+    <button class="btn-edit" id="mypassport-add-btn" onclick="go('s-add-mypassport')" style="display:none;">＋ 新增</button>
+  </div>
+  <div class="content">
+    <div class="person-row">
+      <div class="person-pill active" onclick="spMyPassport(this)">小米</div>
+      <div class="person-pill" onclick="spMyPassport(this)">馬哥</div>
+      <div class="person-pill" onclick="spMyPassport(this)">Samie</div>
+    </div>
+    <div id="mypassport-container"></div>
+    <div class="spacer"></div>
+  </div>
+  <div class="tab-bar">
+    <button class="tab-item" onclick="go('s-home')"><svg viewBox="0 0 24 24"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>總覽</button>
+    <button class="tab-item" onclick="goFlight()"><svg viewBox="0 0 24 24"><path d="M21 16v-2l-8-5V3.5a1.5 1.5 0 0 0-3 0V9l-8 5v2l8-2.5V19l-2 1.5V22l3.5-1 3.5 1v-1.5L13 19v-5.5l8 2.5z"/></svg>機票</button>
+    <button class="tab-item" onclick="goHotel()"><svg viewBox="0 0 24 24"><path d="M2 20v-8a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v8"/><path d="M4 10V6a2 2 0 0 1 2-2h12a2 2 0 0 1 2 2v4"/><path d="M12 4v6"/><path d="M2 20h20"/></svg>住宿</button>
+    <button class="tab-item" onclick="goRestaurant()"><svg viewBox="0 0 24 24"><path d="M18 8h1a4 4 0 0 1 0 8h-1"/><path d="M2 8h16v9a4 4 0 0 1-4 4H6a4 4 0 0 1-4-4V8z"/><line x1="6" y1="1" x2="6" y2="4"/><line x1="10" y1="1" x2="10" y2="4"/><line x1="14" y1="1" x2="14" y2="4"/></svg>餐廳</button>
+    <button class="tab-item" onclick="goTimeline()"><svg viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>行程</button>
+    <button class="tab-item active" onclick="goMyPassport()"><svg viewBox="0 0 24 24"><rect x="2" y="3" width="20" height="18" rx="2"/><path d="M8 10h.01M12 10h.01M16 10h.01M8 14h8"/></svg>護照</button>
+  </div>
+</div>
+
+<!-- 新增護照（總覽用） -->
+<div class="screen" id="s-add-mypassport">
+  <div class="topbar">
+    <button class="icon-btn" onclick="go('s-mypassport')">✕</button>
+    <div class="topbar-title">新增護照</div>
+    <div></div>
+  </div>
+  <div class="content">
+    <div class="section-label" style="margin-top:0;">旅客</div>
+    <div class="person-row">
+      <div class="person-pill active" onclick="sp(this)">小米</div>
+      <div class="person-pill" onclick="sp(this)">馬哥</div>
+      <div class="person-pill" onclick="sp(this)">Samie</div>
+    </div>
+    <label class="form-label">護照號碼</label><input type="text" id="mp-no" placeholder="如：A123456789">
+    <label class="form-label">國籍</label><input type="text" id="mp-country" placeholder="如：中華民國">
+    <label class="form-label">核發日期</label><input type="date" id="mp-issue">
+    <label class="form-label">到期日期</label><input type="date" id="mp-expiry">
+    <label class="form-label">備注</label><input type="text" id="mp-note" placeholder="備注">
+    <div class="btn-row" style="margin-top:16px;">
+      <button class="btn-secondary" onclick="go('s-mypassport')" style="flex:1;">取消</button>
+      <button class="btn-primary" onclick="saveMyPassport()" style="flex:1;">儲存</button>
+    </div>
+    <div class="spacer"></div>
+  </div>
+</div>
+
 </body>
 </html>
