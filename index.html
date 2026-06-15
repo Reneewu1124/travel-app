@@ -593,11 +593,11 @@ const AIRTABLE_TABLES = {
 // 欄位名稱對應（每個表格的欄位順序）
 const AIRTABLE_FIELDS = {
   '旅程': ['rid','旅程名稱','目的地','出發日期','返回日期','旅客'],
-  '機票': ['rid','旅程ID','旅客','航班號','機票號碼','出發機場','出發時間','抵達機場','抵達時間','台灣時間','飛行時間','航廈','座位','艙等','金額','訂位代號'],
-  '住宿': ['rid','旅程ID','飯店名稱','地址','電話','Check-in','Check-out','確認碼','房型','金額','取消政策','泳池','泳池樓層','泳池時間','健身房','健身房樓層','健身房時間'],
-  '餐廳': ['rid','旅程ID','餐廳名稱','地址','訂位時間','台灣時間','人數','確認碼','取消政策','訂金','訂金金額','備注'],
-  '票券': ['rid','旅程ID','旅客','活動名稱','地點名稱','地址','時間','台灣時間','票券號碼','金額'],
-  '簽證護照': ['rid','旅程ID','旅客','類型','國家','簽證類型','護照號碼','核發日期','到期日期','入境次數','備注','QR碼'],
+  '機票': ['rid','旅程ID','旅客','航班號','機票號碼','出發機場','出發時間','抵達機場','抵達時間','台灣時間','飛行時間','航廈','座位','艙等','金額','訂位代號','附件'],
+  '住宿': ['rid','旅程ID','飯店名稱','地址','電話','Check-in','Check-out','確認碼','房型','金額','取消政策','泳池','泳池樓層','泳池時間','健身房','健身房樓層','健身房時間','附件'],
+  '餐廳': ['rid','旅程ID','餐廳名稱','地址','訂位時間','台灣時間','人數','確認碼','取消政策','訂金','訂金金額','備注','附件'],
+  '票券': ['rid','旅程ID','旅客','活動名稱','地點名稱','地址','時間','台灣時間','票券號碼','金額','附件'],
+  '簽證護照': ['rid','旅程ID','旅客','類型','國家','簽證類型','護照號碼','核發日期','到期日期','入境次數','備注','QR碼','附件'],
   '護照': ['rid','旅客','國籍','護照號碼','到期日期','核發日期','備注']
 };
 
@@ -609,6 +609,95 @@ const AIRTABLE_HEADERS = {
 // 快取系統
 const cache = {};
 const CACHE_TIME = 5 * 60 * 1000;
+
+async function uploadAttachment(sheetName, recordId, file) {
+  try {
+    const tableId = AIRTABLE_TABLES[sheetName];
+    const formData = new FormData();
+    formData.append('file', file);
+    
+    // Convert file to base64
+    const base64 = await new Promise((resolve, reject) => {
+      const reader = new FileReader();
+      reader.onload = () => resolve(reader.result.split(',')[1]);
+      reader.onerror = reject;
+      reader.readAsDataURL(file);
+    });
+    
+    const res = await fetch(`https://api.airtable.com/v0/${AIRTABLE_BASE}/${tableId}/${recordId}`, {
+      method: 'PATCH',
+      headers: AIRTABLE_HEADERS,
+      body: JSON.stringify({
+        fields: {
+          '附件': [{ url: `data:${file.type};base64,${base64}`, filename: file.name }]
+        }
+      })
+    });
+    const data = await res.json();
+    return !data.error;
+  } catch(e) { return false; }
+}
+
+function renderAttachments(attachments, recordId, sheetName) {
+  if(!attachments || !attachments.length) return '';
+  let html = '<div style="margin-top:10px;border-top:0.5px solid #f0f0f0;padding-top:10px;">';
+  html += '<div style="font-size:11px;color:#999;margin-bottom:6px;">附件</div>';
+  attachments.forEach(att => {
+    const isImage = att.type && att.type.startsWith('image');
+    const isPDF = att.filename && att.filename.endsWith('.pdf');
+    const icon = isImage ? '🖼️' : isPDF ? '📄' : '📎';
+    html += `<a href="${att.url}" target="_blank" style="display:flex;align-items:center;gap:8px;padding:8px;background:#f9f9f9;border-radius:8px;margin-bottom:6px;text-decoration:none;color:#1a1a1a;">
+      <span style="font-size:18px;">${icon}</span>
+      <span style="font-size:12px;flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${att.filename||'附件'}</span>
+      <span style="font-size:11px;color:#1a73e8;">開啟</span>
+    </a>`;
+  });
+  html += '</div>';
+  return html;
+}
+
+function showUploadModal(sheetName, recordId) {
+  const modal = `<div id="upload-modal" style="position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,0.5);z-index:999;display:flex;align-items:flex-end;">
+    <div style="background:#fff;border-radius:20px 20px 0 0;padding:24px;width:100%;">
+      <div style="font-size:16px;font-weight:600;margin-bottom:16px;">📎 上傳附件</div>
+      <input type="file" id="attach-file-input" accept="image/*,application/pdf" style="display:none;" onchange="handleAttachUpload('${sheetName}','${recordId}')">
+      <button onclick="document.getElementById('attach-file-input').click()" style="width:100%;padding:14px;border:1.5px dashed #e5e5e5;border-radius:12px;background:none;font-size:14px;color:#666;cursor:pointer;margin-bottom:8px;">
+        📷 選擇圖片或 PDF
+      </button>
+      <button onclick="document.getElementById('upload-modal').remove()" style="width:100%;padding:12px;border:0.5px solid #e5e5e5;border-radius:10px;background:none;font-size:14px;color:#666;cursor:pointer;">取消</button>
+    </div>
+  </div>`;
+  document.body.insertAdjacentHTML('beforeend', modal);
+}
+
+async function handleAttachUpload(sheetName, recordId) {
+  const file = document.getElementById('attach-file-input').files[0];
+  if(!file) return;
+  document.getElementById('upload-modal').remove();
+  
+  // Show loading
+  const loading = document.createElement('div');
+  loading.id = 'upload-loading';
+  loading.style.cssText = 'position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);background:rgba(0,0,0,0.8);color:#fff;padding:16px 24px;border-radius:12px;z-index:999;font-size:14px;';
+  loading.textContent = '上傳中...';
+  document.body.appendChild(loading);
+  
+  const ok = await uploadAttachment(sheetName, recordId, file);
+  document.getElementById('upload-loading')?.remove();
+  
+  if(ok) {
+    clearCache();
+    alert('上傳成功！');
+    // Reload current page
+    if(document.getElementById('s-flight').classList.contains('active')) loadFlights();
+    else if(document.getElementById('s-hotel').classList.contains('active')) loadHotel();
+    else if(document.getElementById('s-restaurant').classList.contains('active')) loadRestaurantPage();
+    else if(document.getElementById('s-ticket').classList.contains('active')) loadTickets();
+    else if(document.getElementById('s-passport').classList.contains('active')) loadPassports();
+  } else {
+    alert('上傳失敗，請重試');
+  }
+}
 
 function clearCache() {
   Object.keys(cache).forEach(k => delete cache[k]);
@@ -930,7 +1019,8 @@ async function loadFlights() {
         ${depTime ? '<div class="field-row"><span class="field-label">出發時間</span><span class="field-value">'+depTime+'</span></div>' : ''}
         ${arrTime ? '<div class="field-row"><span class="field-label">抵達時間</span><span class="field-value">'+arrTime+(twTime ? '<br><small style="color:#999;font-size:11px;">(台灣時間 '+twTime+')</small>' : '')+'</span></div>' : ''}
         ${price ? '<div class="field-row"><span class="field-label">金額</span><span class="field-value">'+price+'</span></div>' : ''}
-        ${isAdmin ? '<div class="btn-row" style="margin-top:8px;"><button class="btn-delete" style="flex:1;justify-content:center;" onclick="deleteItem(\'機票\',\''+fid+'\',()=>{clearCache();loadFlights();})">🗑 刪除</button></div>' : ''}
+        ${renderAttachments(f[16], fid, '機票')}
+        ${isAdmin ? '<div class="btn-row" style="margin-top:8px;"><button class="btn-edit" style="flex:1;justify-content:center;" onclick="showUploadModal(\'機票\',\''+fid+'\')">📎 上傳附件</button><button class="btn-delete" style="flex:1;justify-content:center;" onclick="deleteItem(\'機票\',\''+fid+'\',()=>{clearCache();loadFlights();})">🗑 刪除</button></div>' : ''}
       </div>`;
     });
     
@@ -1179,7 +1269,8 @@ async function loadHotel() {
           ${h[8] ? '<div class="field-row"><span class="field-label">房型</span><span class="field-value">'+h[8]+'</span></div>' : ''}
           ${h[9] ? '<div class="field-row"><span class="field-label">金額</span><span class="field-value">'+h[9]+'</span></div>' : ''}
           ${h[10] ? '<div class="field-row"><span class="field-label">取消政策</span><span class="field-value">'+h[10]+'</span></div>' : ''}
-          ${isAdmin ? '<div class="btn-row" style="margin-top:8px;"><button class="btn-delete" style="flex:1;justify-content:center;" onclick="deleteItem(\'住宿\',\''+hid+'\',()=>{clearCache();loadHotel();})">🗑 刪除</button></div>' : ''}
+          ${renderAttachments(h[17], hid, '住宿')}
+          ${isAdmin ? '<div class="btn-row" style="margin-top:8px;"><button class="btn-edit" style="flex:1;justify-content:center;" onclick="showUploadModal(\'住宿\',\''+hid+'\')">📎 上傳附件</button><button class="btn-delete" style="flex:1;justify-content:center;" onclick="deleteItem(\'住宿\',\''+hid+'\',()=>{clearCache();loadHotel();})">🗑 刪除</button></div>' : ''}
         </div>
       </div>
       ${(pool || gym) ? `<div class="section-label">飯店設施</div>
@@ -1225,7 +1316,8 @@ async function loadTickets() {
           ${t[6] ? '<div class="field-row"><span class="field-label">時間</span><span class="field-value">'+formatDisplayTime(t[6])+'</span></div>' : ''}
           ${t[8] ? '<div class="field-row"><span class="field-label">票券號碼</span><span class="field-value">'+t[8]+'</span></div>' : ''}
           ${t[9] ? '<div class="field-row"><span class="field-label">金額</span><span class="field-value">'+t[9]+'</span></div>' : ''}
-          ${isAdmin ? '<div class="btn-row" style="margin-top:8px;"><button class="btn-delete" style="flex:1;justify-content:center;" onclick="deleteItem(\'票券\',\''+tid+'\',()=>{clearCache();loadTickets();})">🗑 刪除</button></div>' : ''}
+          ${renderAttachments(t[10], tid, '票券')}
+          ${isAdmin ? '<div class="btn-row" style="margin-top:8px;"><button class="btn-edit" style="flex:1;justify-content:center;" onclick="showUploadModal(\'票券\',\''+tid+'\')">📎 上傳附件</button><button class="btn-delete" style="flex:1;justify-content:center;" onclick="deleteItem(\'票券\',\''+tid+'\',()=>{clearCache();loadTickets();})">🗑 刪除</button></div>' : ''}
         </div>
       </div>`;
     });
@@ -1316,8 +1408,9 @@ async function loadRestaurantPage() {
           ${r[9] ? '<div class="field-row"><span class="field-label">訂金</span><span class="field-value">'+r[9]+'</span></div>' : ''}
           ${r[10] ? '<div class="field-row"><span class="field-label">訂金金額</span><span class="field-value">'+r[10]+'</span></div>' : ''}
           ${r[11] ? '<div class="field-row"><span class="field-label">備注</span><span class="field-value">'+r[11]+'</span></div>' : ''}
+          ${renderAttachments(r[12], rid, '餐廳')}
         </div>
-        ${isAdmin ? '<div class="btn-row" style="margin-top:8px;"><button class="btn-delete" style="flex:1;justify-content:center;" onclick="deleteItem(\'餐廳\',\''+rid+'\',()=>{clearCache();goRestaurant();})">🗑 刪除</button></div>' : ''}
+        ${isAdmin ? '<div class="btn-row" style="margin-top:8px;"><button class="btn-edit" style="flex:1;justify-content:center;" onclick="showUploadModal(\'餐廳\',\''+rid+'\')">📎 上傳附件</button><button class="btn-delete" style="flex:1;justify-content:center;" onclick="deleteItem(\'餐廳\',\''+rid+'\',()=>{clearCache();goRestaurant();})">🗑 刪除</button></div>' : ''}
       </div>`;
     });
     container.innerHTML = html;
