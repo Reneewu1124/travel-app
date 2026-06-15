@@ -612,12 +612,13 @@ async function saveToSheet(sheetName, row) {
       if(row[i] !== undefined && row[i] !== '') record[f] = String(row[i]);
     });
     
-    await fetch(`https://api.airtable.com/v0/${AIRTABLE_BASE}/${tableId}`, {
+    const res = await fetch(`https://api.airtable.com/v0/${AIRTABLE_BASE}/${tableId}`, {
       method: 'POST',
       headers: AIRTABLE_HEADERS,
       body: JSON.stringify({ fields: record })
     });
-    return true;
+    const data = await res.json();
+    return data.id || true;
   } catch(e) {
     alert('儲存失敗，請檢查網路連線');
     return false;
@@ -753,7 +754,7 @@ async function loadTrips() {
     let pastCount = 0;
     
     trips.reverse().forEach(row => {
-      const id = row[0];
+      const id = row[0]; // This is now the Airtable record ID (rec...)
       const name = row[1] || '';
       const dest = row[2] || '';
       const startDate = row[3] ? new Date(row[3]) : null;
@@ -1039,9 +1040,18 @@ async function saveTrip() {
   const start = inputs[2].value;
   const end = inputs[3].value;
   if(!name){ alert('請填寫旅程名稱'); return; }
+  const travelers = [];
+  if(document.getElementById('check-mimi')?.textContent === '✓') travelers.push('小米');
+  if(document.getElementById('check-mage')?.textContent === '✓') travelers.push('馬哥');
+  if(document.getElementById('check-samie')?.textContent === '✓') travelers.push('Samie');
+  document.querySelectorAll('#extra-travelers .card').forEach(card => {
+    const nameEl = card.querySelector('div[style*="font-weight:600"]');
+    if(nameEl) travelers.push(nameEl.textContent.trim());
+  });
+  if(travelers.length === 0) { alert('請至少選擇一位旅客'); return; }
   const id = Date.now();
-  const ok = await saveToSheet('旅程', [id, name, dest, start, end]);
-  if(ok){ clearCache(); alert('旅程建立成功！'); go('s-home'); loadTrips(); }
+  const recordId = await saveToSheet('旅程', [id, name, dest, start, end, travelers.join(',')]);
+  if(recordId){ clearCache(); alert('旅程建立成功！'); go('s-home'); loadTrips(); }
 }
 
 async function saveFlight() {
