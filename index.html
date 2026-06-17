@@ -2,7 +2,7 @@
 <html lang="zh-TW">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
 <meta name="theme-color" content="#1a1a1a">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black">
@@ -11,13 +11,14 @@
 <link rel="manifest" href="manifest.json">
 <style>
 *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent;}
-body{font-family:-apple-system,BlinkMacSystemFont,'Helvetica Neue',Arial,sans-serif;background:#f5f5f5;color:#1a1a1a;max-width:430px;margin:0 auto;min-height:100vh;background:#fff;}
-.screen{display:none;flex-direction:column;min-height:100vh;}
+html{overflow-x:hidden;width:100%;}
+body{font-family:-apple-system,BlinkMacSystemFont,'Helvetica Neue',Arial,sans-serif;color:#1a1a1a;max-width:430px;margin:0 auto;min-height:100vh;background:#fff;overflow-x:hidden;width:100%;position:relative;}
+.screen{display:none;flex-direction:column;min-height:100vh;overflow-x:hidden;width:100%;}
 .screen.active{display:flex;}
 
 /* 頂部導覽 */
 .topbar{display:flex;align-items:center;justify-content:space-between;padding:16px 20px 12px;background:#fff;border-bottom:0.5px solid #e5e5e5;position:sticky;top:0;z-index:10;}
-.topbar-title{font-size:17px;font-weight:600;display:flex;align-items:center;gap:8px;}
+.topbar-title{font-size:17px;font-weight:600;display:flex;align-items:center;gap:8px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;flex:1;margin:0 8px;}
 .topbar-right{display:flex;align-items:center;gap:10px;}
 .mode-badge{font-size:11px;padding:3px 10px;border-radius:20px;}
 .mode-admin{background:#1a1a1a;color:#fff;}
@@ -292,6 +293,7 @@ textarea{resize:none;}
       <div class="person-pill" onclick="sp(this)">馬哥</div>
       <div class="person-pill" onclick="sp(this)">Samie</div>
     </div>
+    <label class="form-label">航空公司</label><input type="text" id="f-airline" placeholder="如：中華航空、長榮航空">
     <label class="form-label">航班號</label><input type="text" id="f-flight" placeholder="如：CI178">
     <label class="form-label">機票號碼</label><input type="text" id="f-ticketno" placeholder="如：297-1234567890">
     <label class="form-label">出發機場</label>
@@ -587,7 +589,7 @@ const AIRTABLE_TABLES = {
 // 欄位名稱對應（每個表格的欄位順序）
 const AIRTABLE_FIELDS = {
   '旅程': ['rid','旅程名稱','目的地','出發日期','返回日期','旅客'],
-  '機票': ['rid','旅程ID','旅客','航班號','機票號碼','出發機場','出發時間','抵達機場','抵達時間','台灣時間','飛行時間','航廈','座位','艙等','金額','訂位代號','附件'],
+  '機票': ['rid','旅程ID','旅客','航班號','機票號碼','出發機場','出發時間','抵達機場','抵達時間','台灣時間','飛行時間','航廈','座位','艙等','金額','訂位代號','附件','航空公司'],
   '住宿': ['rid','旅程ID','飯店名稱','地址','電話','Check-in','Check-out','確認碼','房型','金額','取消政策','泳池','泳池樓層','泳池時間','健身房','健身房樓層','健身房時間','附件'],
   '餐廳': ['rid','旅程ID','餐廳名稱','地址','訂位時間','台灣時間','人數','確認碼','取消政策','訂金','訂金金額','備注','附件'],
   '票券': ['rid','旅程ID','旅客','活動名稱','地點名稱','地址','時間','台灣時間','票券號碼','金額','附件'],
@@ -607,9 +609,6 @@ const CACHE_TIME = 5 * 60 * 1000;
 async function uploadAttachment(sheetName, recordId, file) {
   try {
     const tableId = AIRTABLE_TABLES[sheetName];
-    const formData = new FormData();
-    formData.append('file', file);
-    
     // Convert file to base64
     const base64 = await new Promise((resolve, reject) => {
       const reader = new FileReader();
@@ -617,17 +616,18 @@ async function uploadAttachment(sheetName, recordId, file) {
       reader.onerror = reject;
       reader.readAsDataURL(file);
     });
-    
-    const res = await fetch(`https://api.airtable.com/v0/${AIRTABLE_BASE}/${tableId}/${recordId}`, {
-      method: 'PATCH',
-      headers: AIRTABLE_HEADERS,
+
+    // Use Airtable upload attachment endpoint
+    const uploadRes = await fetch(`https://api.airtable.com/v0/${AIRTABLE_BASE}/${tableId}/${recordId}/uploadAttachment`, {
+      method: 'POST',
+      headers: { 'Authorization': `Bearer ${AIRTABLE_TOKEN}`, 'Content-Type': 'application/json' },
       body: JSON.stringify({
-        fields: {
-          '附件': [{ url: `data:${file.type};base64,${base64}`, filename: file.name }]
-        }
+        contentType: file.type,
+        filename: file.name,
+        file: base64
       })
     });
-    const data = await res.json();
+    const data = await uploadRes.json();
     return !data.error;
   } catch(e) { return false; }
 }
@@ -986,6 +986,8 @@ async function loadFlights() {
       const pnr = f[15] || '';
       const flightNo = f[3] || '';
       const ticketNo = f[4] || '';
+      const airline = f[17] || '';
+      const attachments = f[16] || [];
       
       html += `<div class="flight-board">
         <div class="flight-route">
@@ -1000,6 +1002,7 @@ async function loadFlights() {
           </div>
         </div>
         <div class="flight-info">
+          ${airline ? '<span class="flight-tag">'+airline+'</span>' : ''}
           ${flightNo ? '<span class="flight-tag">'+flightNo+'</span>' : ''}
           ${duration ? '<span class="flight-tag">'+duration+'</span>' : ''}
           ${terminal ? '<span class="flight-tag">'+terminal+'</span>' : ''}
@@ -1013,7 +1016,7 @@ async function loadFlights() {
         ${depTime ? '<div class="field-row"><span class="field-label">出發時間</span><span class="field-value">'+depTime+'</span></div>' : ''}
         ${arrTime ? '<div class="field-row"><span class="field-label">抵達時間</span><span class="field-value">'+arrTime+(twTime ? '<br><small style="color:#999;font-size:11px;">(台灣時間 '+twTime+')</small>' : '')+'</span></div>' : ''}
         ${price ? '<div class="field-row"><span class="field-label">金額</span><span class="field-value">'+price+'</span></div>' : ''}
-        ${renderAttachments(f[16], fid, '機票')}
+        ${renderAttachments(attachments, fid, '機票')}
         ${isAdmin ? '<div class="btn-row" style="margin-top:8px;"><button class="btn-edit" style="flex:1;justify-content:center;" onclick="showUploadModal(\'機票\',\''+fid+'\')">📎 上傳附件</button><button class="btn-delete" style="flex:1;justify-content:center;" onclick="deleteItem(\'機票\',\''+fid+'\',()=>{clearCache();loadFlights();})">🗑 刪除</button></div>' : ''}
       </div>`;
     });
@@ -1179,6 +1182,7 @@ async function saveTrip() {
 
 async function saveFlight() {
   const person = document.querySelector('#s-add-flight .person-pill.active')?.textContent || '';
+  const airline = document.getElementById('f-airline')?.value || '';
   const flight = document.getElementById('f-flight')?.value || '';
   const ticketNo = document.getElementById('f-ticketno')?.value || '';
   const depAirport = document.getElementById('f-dep-airport')?.value || '';
@@ -1202,7 +1206,7 @@ async function saveFlight() {
   
   if(!flight){ alert('請填寫航班號'); return; }
   const id = Date.now();
-  const ok = await saveToSheet('機票', [id, currentTripId, person, flight, ticketNo, depAirport, depDateTime, arrAirport, arrDateTime, twDateTime, duration, terminal, seat, cabin, price, pnr]);
+  const ok = await saveToSheet('機票', [id, currentTripId, person, flight, ticketNo, depAirport, depDateTime, arrAirport, arrDateTime, twDateTime, duration, terminal, seat, cabin, price, pnr, '', airline]);
   if(ok){ clearCache(); alert('機票新增成功！'); go('s-flight'); loadFlights(); }
 }
 
