@@ -574,7 +574,9 @@ textarea{resize:none;}
 <script>
 const CLIENT_ID = '1076023430172-89l58tgg1i0sqloc5pdbspqmg86cirrh.apps.googleusercontent.com';
 // Airtable 設定
-const AIRTABLE_TOKEN = 'pat5bP1Ha9DtWe2OR.9e74194c373e8557ccfba67bd167a6b328e24aded899806b9b6bd855dfb3b045';
+// 金鑰已移到 Cloudflare Worker（中間人），前端不再保存任何金鑰。
+// 所有請求改打到下面這個 Worker 網址，由 Worker 補上金鑰再轉給 Airtable。
+const AIRTABLE_PROXY = 'https://travel-app-proxy.pooh0930087373.workers.dev';
 const AIRTABLE_BASE = 'appg34JR0EZtvk4iD';
 const AIRTABLE_TABLES = {
   '旅程': 'tbl6ygIDvjgCLmozz',
@@ -598,7 +600,6 @@ const AIRTABLE_FIELDS = {
 };
 
 const AIRTABLE_HEADERS = {
-  'Authorization': `Bearer ${AIRTABLE_TOKEN}`,
   'Content-Type': 'application/json'
 };
 
@@ -618,9 +619,9 @@ async function uploadAttachment(sheetName, recordId, file) {
     });
 
     // Use Airtable upload attachment endpoint
-    const uploadRes = await fetch(`https://api.airtable.com/v0/${AIRTABLE_BASE}/${tableId}/${recordId}/uploadAttachment`, {
+    const uploadRes = await fetch(`${AIRTABLE_PROXY}/v0/${AIRTABLE_BASE}/${tableId}/${recordId}/uploadAttachment`, {
       method: 'POST',
-      headers: { 'Authorization': `Bearer ${AIRTABLE_TOKEN}`, 'Content-Type': 'application/json' },
+      headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
         contentType: file.type,
         filename: file.name,
@@ -632,65 +633,51 @@ async function uploadAttachment(sheetName, recordId, file) {
   } catch(e) { return false; }
 }
 
-function renderAttachments(attachments, recordId, sheetName) {
-  if(!attachments || !attachments.length) return '';
-  let html = '<div style="margin-top:10px;border-top:0.5px solid #f0f0f0;padding-top:10px;">';
-  html += '<div style="font-size:11px;color:#999;margin-bottom:6px;">附件</div>';
-  attachments.forEach(att => {
-    const isImage = att.type && att.type.startsWith('image');
-    const isPDF = att.filename && att.filename.endsWith('.pdf');
-    const icon = isImage ? '🖼️' : isPDF ? '📄' : '📎';
-    html += `<a href="${att.url}" target="_blank" style="display:flex;align-items:center;gap:8px;padding:8px;background:#f9f9f9;border-radius:8px;margin-bottom:6px;text-decoration:none;color:#1a1a1a;">
-      <span style="font-size:18px;">${icon}</span>
-      <span style="font-size:12px;flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${att.filename||'附件'}</span>
+function renderAttachments(link, recordId, sheetName) {
+  if(!link) return '';
+  return `<div style="margin-top:10px;border-top:0.5px solid #f0f0f0;padding-top:10px;">
+    <div style="font-size:11px;color:#999;margin-bottom:6px;">附件連結</div>
+    <a href="${link}" target="_blank" style="display:flex;align-items:center;gap:8px;padding:8px;background:#f9f9f9;border-radius:8px;text-decoration:none;color:#1a1a1a;">
+      <span style="font-size:18px;">🔗</span>
+      <span style="font-size:12px;flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${link}</span>
       <span style="font-size:11px;color:#1a73e8;">開啟</span>
-    </a>`;
-  });
-  html += '</div>';
-  return html;
+    </a>
+  </div>`;
 }
 
 function showUploadModal(sheetName, recordId) {
   const modal = `<div id="upload-modal" style="position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,0.5);z-index:999;display:flex;align-items:flex-end;">
     <div style="background:#fff;border-radius:20px 20px 0 0;padding:24px;width:100%;">
-      <div style="font-size:16px;font-weight:600;margin-bottom:16px;">📎 上傳附件</div>
-      <input type="file" id="attach-file-input" accept="image/*,application/pdf" style="display:none;" onchange="handleAttachUpload('${sheetName}','${recordId}')">
-      <button onclick="document.getElementById('attach-file-input').click()" style="width:100%;padding:14px;border:1.5px dashed #e5e5e5;border-radius:12px;background:none;font-size:14px;color:#666;cursor:pointer;margin-bottom:8px;">
-        📷 選擇圖片或 PDF
-      </button>
+      <div style="font-size:16px;font-weight:600;margin-bottom:8px;">🔗 貼上附件連結</div>
+      <div style="font-size:12px;color:#999;margin-bottom:12px;">貼上 Google Drive、Dropbox 或任何檔案的分享連結</div>
+      <input type="text" id="attach-link-input" placeholder="https://..." style="width:100%;padding:10px 12px;border:0.5px solid #e5e5e5;border-radius:8px;font-size:14px;margin-bottom:12px;">
+      <button onclick="saveAttachLink('${sheetName}','${recordId}')" style="width:100%;padding:13px;background:#1a1a1a;color:#fff;border:none;border-radius:12px;font-size:14px;font-weight:600;cursor:pointer;margin-bottom:8px;">儲存連結</button>
       <button onclick="document.getElementById('upload-modal').remove()" style="width:100%;padding:12px;border:0.5px solid #e5e5e5;border-radius:10px;background:none;font-size:14px;color:#666;cursor:pointer;">取消</button>
     </div>
   </div>`;
   document.body.insertAdjacentHTML('beforeend', modal);
 }
 
-async function handleAttachUpload(sheetName, recordId) {
-  const file = document.getElementById('attach-file-input').files[0];
-  if(!file) return;
+async function saveAttachLink(sheetName, recordId) {
+  const link = document.getElementById('attach-link-input')?.value?.trim();
+  if(!link) { alert('請貼上連結'); return; }
   document.getElementById('upload-modal').remove();
   
-  // Show loading
-  const loading = document.createElement('div');
-  loading.id = 'upload-loading';
-  loading.style.cssText = 'position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);background:rgba(0,0,0,0.8);color:#fff;padding:16px 24px;border-radius:12px;z-index:999;font-size:14px;';
-  loading.textContent = '上傳中...';
-  document.body.appendChild(loading);
-  
-  const ok = await uploadAttachment(sheetName, recordId, file);
-  document.getElementById('upload-loading')?.remove();
-  
-  if(ok) {
+  const tableId = AIRTABLE_TABLES[sheetName];
+  try {
+    await fetch(`${AIRTABLE_PROXY}/v0/${AIRTABLE_BASE}/${tableId}/${recordId}`, {
+      method: 'PATCH',
+      headers: AIRTABLE_HEADERS,
+      body: JSON.stringify({ fields: { '附件': link } })
+    });
     clearCache();
-    alert('上傳成功！');
-    // Reload current page
+    alert('連結儲存成功！');
     if(document.getElementById('s-flight').classList.contains('active')) loadFlights();
     else if(document.getElementById('s-hotel').classList.contains('active')) loadHotel();
     else if(document.getElementById('s-restaurant').classList.contains('active')) loadRestaurantPage();
     else if(document.getElementById('s-ticket').classList.contains('active')) loadTickets();
     else if(document.getElementById('s-passport').classList.contains('active')) loadPassports();
-  } else {
-    alert('上傳失敗，請重試');
-  }
+  } catch(e) { alert('儲存失敗，請重試'); }
 }
 
 function clearCache() {
@@ -705,7 +692,7 @@ async function loadFromSheet(sheetName) {
   try {
     const tableId = AIRTABLE_TABLES[sheetName];
     if(!tableId) return [];
-    const res = await fetch(`https://api.airtable.com/v0/${AIRTABLE_BASE}/${tableId}?pageSize=100`, {
+    const res = await fetch(`${AIRTABLE_PROXY}/v0/${AIRTABLE_BASE}/${tableId}?pageSize=100`, {
       headers: AIRTABLE_HEADERS
     });
     const data = await res.json();
@@ -741,7 +728,7 @@ async function saveToSheet(sheetName, row) {
       if(row[i] !== undefined && row[i] !== '') record[f] = String(row[i]);
     });
     
-    const res = await fetch(`https://api.airtable.com/v0/${AIRTABLE_BASE}/${tableId}`, {
+    const res = await fetch(`${AIRTABLE_PROXY}/v0/${AIRTABLE_BASE}/${tableId}`, {
       method: 'POST',
       headers: AIRTABLE_HEADERS,
       body: JSON.stringify({ fields: record })
@@ -758,7 +745,7 @@ async function deleteFromSheet(sheetName, id) {
   try {
     const tableId = AIRTABLE_TABLES[sheetName];
     if(!tableId) return false;
-    await fetch(`https://api.airtable.com/v0/${AIRTABLE_BASE}/${tableId}/${id}`, {
+    await fetch(`${AIRTABLE_PROXY}/v0/${AIRTABLE_BASE}/${tableId}/${id}`, {
       method: 'DELETE',
       headers: AIRTABLE_HEADERS
     });
@@ -987,7 +974,7 @@ async function loadFlights() {
       const flightNo = f[3] || '';
       const ticketNo = f[4] || '';
       const airline = f[17] || '';
-      const attachments = f[16] || [];
+      const attachments = f[16] || '';
       
       html += `<div class="flight-board">
         <div class="flight-route">
